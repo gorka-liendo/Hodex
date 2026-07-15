@@ -7,9 +7,19 @@ function App() {
     <div id="top">
       <Header />
 
-      {/* HERO — placeholder on-brand para ver flotar el header */}
-      <section className="flex min-h-screen flex-col justify-end bg-hodex-black pb-12 pt-40 text-hodex-white">
-        <div className="mx-auto w-full max-w-6xl px-6">
+      {/* HERO — video de fondo */}
+      <section className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-hodex-black pb-12 pt-40 text-hodex-white">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+        >
+          <source src="/video2.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="mx-auto w-full max-w-6xl px-6 relative z-10">
           <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">
             Full-cycle digital product creation
             <span className="h-px max-w-[220px] flex-1 bg-hodex-line-dark" />
