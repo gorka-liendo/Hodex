@@ -1,4 +1,5 @@
 import Header from './components/Header'
+import Work from './components/Work'
 
 function App() {
   return (
@@ -27,21 +28,8 @@ function App() {
         </div>
       </section>
 
-      {/* Secciones placeholder solo para dar altura y demostrar el scroll */}
-      <section id="work" className="border-b border-hodex-line py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-gray">
-            Selected work
-            <span className="h-px max-w-[220px] flex-1 bg-hodex-line" />
-          </div>
-          <h2 className="mt-6 font-display text-h2 font-light leading-tight">
-            Proyectos
-          </h2>
-          <p className="mt-4 max-w-[600px] text-hodex-gray">
-            Sección placeholder — aquí irá la rejilla de proyectos.
-          </p>
-        </div>
-      </section>
+      {/* WORK — proyectos */}
+      <Work />
 
       <section id="partners" className="border-b border-hodex-line py-24">
         <div className="mx-auto max-w-6xl px-6">
