@@ -1,0 +1,62 @@
+# Orquestación de Hodex: backend (API Node) + frontend (nginx sirviendo el build
+# de Vite y haciendo de proxy /api → backend). El frontend espera a que el
+# backend esté "healthy" antes de arrancar.
+#
+# Uso:
+#   docker compose up --build            # levantar todo
+#   docker compose up --build -d         # en segundo plano
+#   docker compose down                  # parar y limpiar
+#
+# Variables opcionales (SMTP, etc.): crea un .env en esta carpeta; Compose lo
+# inyecta automáticamente en las ${...} de abajo.
+
+services:
+  backend:
+    build:
+      context: ./backend
+    image: hodex-backend
+    restart: unless-stopped
+    init: true # PID 1 correcto → señales y apagado elegante
+    environment:
+      NODE_ENV: production
+      PORT: "4000"
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:8080}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      CONTACT_TO: ${CONTACT_TO:-}
+      CONTACT_FROM: ${CONTACT_FROM:-}
+    ports:
+      # Publicado para poder depurar la API directamente (opcional).
+      - "4000:4000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - hodex
+
+  frontend:
+    build:
+      context: ./frontend
+    image: hodex-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "8080:80"
+    networks:
+      - hodex
+
+networks:
+  hodex:
+    driver: bridge

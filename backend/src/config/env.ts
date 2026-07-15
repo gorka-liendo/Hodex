@@ -2,6 +2,12 @@ import 'dotenv/config'
 import { z } from 'zod'
 
 /**
+ * Trata el string vacío como ausente. Compose inyecta las variables no definidas
+ * como "" (no como undefined), así que sin esto los campos opcionales fallarían.
+ */
+const emptyToUndefined = (v: unknown) => (v === '' ? undefined : v)
+
+/**
  * Esquema de variables de entorno. Se valida al arrancar: si algo falta o es
  * inválido, el proceso termina con un mensaje claro en vez de fallar en runtime.
  */
@@ -12,17 +18,20 @@ const envSchema = z.object({
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
 
   // Email (opcional).
-  SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z.coerce.number().int().positive().optional(),
+  SMTP_HOST: z.preprocess(emptyToUndefined, z.string().optional()),
+  SMTP_PORT: z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().positive().optional(),
+  ),
   // Evitamos z.coerce.boolean() (convierte cualquier string no vacío en true).
   SMTP_SECURE: z
     .string()
     .default('false')
     .transform((v) => v === 'true'),
-  SMTP_USER: z.string().optional(),
-  SMTP_PASS: z.string().optional(),
-  CONTACT_TO: z.string().email().optional(),
-  CONTACT_FROM: z.string().optional(),
+  SMTP_USER: z.preprocess(emptyToUndefined, z.string().optional()),
+  SMTP_PASS: z.preprocess(emptyToUndefined, z.string().optional()),
+  CONTACT_TO: z.preprocess(emptyToUndefined, z.string().email().optional()),
+  CONTACT_FROM: z.preprocess(emptyToUndefined, z.string().optional()),
 })
 
 const parsed = envSchema.safeParse(process.env)
