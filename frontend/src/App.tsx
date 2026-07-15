@@ -1,5 +1,6 @@
 import Header from './components/Header'
 import Work from './components/Work'
+import Contact from './components/Contact'
 
 function App() {
   return (
@@ -55,17 +56,8 @@ function App() {
         </div>
       </section>
 
-      <section id="contact" className="bg-hodex-black py-24 text-hodex-white">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">
-            Get in touch
-            <span className="h-px max-w-[220px] flex-1 bg-hodex-line-dark" />
-          </div>
-          <h2 className="mt-6 font-display text-h2 font-light leading-tight">
-            Contacto
-          </h2>
-        </div>
-      </section>
+      {/* CONTACT — formulario */}
+      <Contact />
     </div>
   )
 }
