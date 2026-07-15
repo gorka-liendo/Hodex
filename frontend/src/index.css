@@ -1,0 +1,104 @@
+/* =========================================================================
+   HODEX — DESIGN TOKENS  (Tailwind v4)
+   Estética heredada del design system "Valthera" (private capital, swiss).
+   Sistema de marca minimalista: 4 colores, cero excepciones.
+   Radio de esquina: 0 en TODO el sistema — decisión de marca inquebrantable.
+   El cobre aparece UNA sola vez por pantalla (CTA principal), nunca decoración.
+   ========================================================================= */
+
+/* Onest = body font (Google Fonts). Helvetica Neue = display (fuente de sistema). */
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  /* ===== Color — solo 4 protagonistas, cero excepciones =================== */
+  --color-hodex-black: #111010;
+  --color-hodex-white: #ffffff;
+  --color-hodex-off-white: #fafafa;
+  --color-hodex-gray: #6e6e6e; /* texto secundario / body en fondo claro */
+  --color-hodex-gray-light: #a6a6a6;
+  --color-hodex-copper-1: #892b01;
+  --color-hodex-copper-2: #b43801;
+
+  /* Hairlines — nunca un border sólido grueso. Uso: border-hodex-line /
+     border-hodex-line-dark (ya llevan la opacidad exacta 0.14 / 0.16). */
+  --color-hodex-line: rgba(17, 16, 16, 0.14);
+  --color-hodex-line-dark: rgba(255, 255, 255, 0.16);
+
+  /* ===== Tipografía ======================================================= */
+  --font-display: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* peso 200/300 */
+  --font-body: 'Onest', sans-serif;
+
+  /* ===== Escala tipográfica (medida al milímetro) ========================= */
+  --text-wordmark: clamp(96px, 17vw, 260px);
+  --text-wordmark--line-height: 1.02;
+  --text-wordmark--letter-spacing: -0.01em;
+
+  --text-h1: 56px;
+  --text-h1--line-height: 1.02;
+  --text-h2: 40px;
+  --text-h2--line-height: 1.02;
+  --text-h3: 28px;
+  --text-h3--line-height: 1.1;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-small: 13px;
+  --text-eyebrow: 12px;
+  /* body = text-base (16px) por defecto de Tailwind */
+
+  /* ===== Tracking (letter-spacing) ======================================== */
+  --tracking-eyebrow: 0.18em; /* SOLO en eyebrow labels */
+  --tracking-headline: 0.01em;
+  --tracking-wordmark: -0.01em;
+
+  /* ===== Line-height ====================================================== */
+  --leading-tight: 1.02; /* headlines / wordmark */
+  --leading-body: 1.6;
+
+  /* ===== Espaciado — base 8px. El scale por defecto de Tailwind ya es 4px,
+     así que 2=8 · 4=16 · 6=24 · 8=32 · 12=48 · 16=64 · 24=96. sp-9 (140px)
+     se añade como spacing "9" abajo. ====================================== */
+  --spacing-9: 140px;
+
+  /* ===== Radius — 0 en TODO el sistema. No hay variante redondeada. ======= */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+}
+
+/* ===== Utilidad de marca: gradiente de cobre 135° ========================
+   El único gradiente del sistema. Uso: class="bg-copper-gradient".
+   Encapsulado para que el CTA principal sea siempre idéntico, pixel a pixel. */
+@utility bg-copper-gradient {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-hodex-copper-1),
+    var(--color-hodex-copper-2)
+  );
+}
+
+/* ===== Base ============================================================== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-hodex-white);
+    color: var(--color-hodex-black);
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
