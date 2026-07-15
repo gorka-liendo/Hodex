@@ -1,4 +1,6 @@
 import Reveal from './Reveal'
+import golinkImg from '../assets/golink.jpg'
+import mytrainerhubImg from '../assets/mytrainerhub.jpg'
 
 /**
  * Work — sección "Selected work". Filas editoriales grandes en zigzag alternado,
@@ -19,6 +21,7 @@ type Project = {
   description: string
   tags: string[]
   status: string
+  image: string
 }
 
 const PROJECTS: Project[] = [
@@ -30,9 +33,10 @@ const PROJECTS: Project[] = [
     discipline: 'IA · Creator economy',
     tagline: 'El método de los creadores que sigues.',
     description:
-      'Plataforma potenciada por IA para la economía de creadores: convierte audiencia en producto, unificando enlaces, contenido y monetización en un solo flujo inteligente.',
-    tags: ['IA', 'Creators', 'SaaS'],
+      'Marketplace de creadores: guías, plantillas, cursos y planes de fitness, viajes, finanzas y muchos nichos más. Se compra una vez y es tuyo para siempre.',
+    tags: ['IA', 'Marketplace', 'Creators'],
     status: '2026 — En desarrollo',
+    image: golinkImg,
   },
   {
     index: '02',
@@ -40,11 +44,12 @@ const PROJECTS: Project[] = [
     domain: 'mytrainerhub.es',
     href: 'https://mytrainerhub.es',
     discipline: 'IA · Fitness',
-    tagline: 'El software del entrenador personal.',
+    tagline: 'Menos Excel. Más resultados.',
     description:
-      'Sistema todo-en-uno para entrenadores personales: planes, seguimiento de clientes y programación automatizados por IA para escalar su negocio sin perder el trato humano.',
+      'Software para entrenadores personales: sustituye el caos de las hojas de cálculo por planes, seguimiento de clientes y automatización con IA, sin perder el trato humano.',
     tags: ['IA', 'Fitness', 'SaaS'],
     status: '2026 — En desarrollo',
+    image: mytrainerhubImg,
   },
 ]
 
@@ -60,11 +65,14 @@ function BrowserMock({ project }: { project: Project }) {
           {project.domain}
         </span>
       </div>
-      {/* Lienzo con el wordmark grabado, hace zoom al hover de la fila */}
-      <div className="flex aspect-[16/10] items-center justify-center overflow-hidden bg-[linear-gradient(160deg,#d8d8d8,#f2f2f2)]">
-        <span className="font-display text-4xl font-extralight uppercase tracking-wordmark text-hodex-black/25 transition-transform duration-700 ease-out group-hover:scale-110 md:text-5xl">
-          {project.name}
-        </span>
+      {/* Captura real de la landing, hace zoom sutil al hover de la fila */}
+      <div className="aspect-[16/10] overflow-hidden bg-hodex-black">
+        <img
+          src={project.image}
+          alt={`Landing de ${project.name}`}
+          loading="lazy"
+          className="h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
+        />
       </div>
     </div>
   )
@@ -85,7 +93,7 @@ function ProjectRow({ project, reverse }: { project: Project; reverse: boolean }
             </span>
           </div>
 
-          <h3 className="mt-6 font-display text-4xl font-light uppercase leading-tight tracking-headline md:text-h2">
+          <h3 className="mt-6 font-display text-4xl font-light leading-tight tracking-headline md:text-h2">
             {project.name}
           </h3>
           <p className="mt-3 font-body text-body-lg text-hodex-gray">
