@@ -12,7 +12,6 @@ function App() {
         <video
           autoPlay
           muted
-          loop
           playsInline
           className="absolute inset-0 h-full w-full object-cover"
         >
