@@ -56,11 +56,16 @@ export default function Header() {
           }`}
         >
           {/* Wordmark */}
-          <a
-            href="#top"
-            className="font-display text-xl font-light tracking-headline text-hodex-black transition-opacity hover:opacity-70"
-          >
-            HODEX
+          <a href="#top" className="flex items-center gap-2 transition-opacity hover:opacity-70">
+            <img
+              src="/Honma_Interior_logo.svg"
+              alt="Hodex"
+              className="h-6 md:h-7"
+            />
+            <span className="font-display text-xl font-light tracking-headline text-hodex-black">
+              HODEX
+            </span>
+          </a>
           </a>
 
           {/* Nav desktop */}
