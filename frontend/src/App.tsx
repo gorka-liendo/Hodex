@@ -8,7 +8,7 @@ function App() {
       <Header />
 
       {/* HERO — video de fondo */}
-      <section className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-hodex-black pb-12 pt-40 text-hodex-white">
+      <section className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-hodex-black pb-20 pt-40 text-hodex-white">
         <video
           autoPlay
           muted
