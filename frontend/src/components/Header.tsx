@@ -66,7 +66,6 @@ export default function Header() {
               HODEX
             </span>
           </a>
-          </a>
 
           {/* Nav desktop */}
           <ul className="hidden items-center gap-8 md:flex">
