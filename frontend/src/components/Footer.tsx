@@ -8,11 +8,11 @@ import Reveal from './Reveal'
  */
 
 const NAV = [
-  { label: 'Quiénes somos', href: '#about' },
-  { label: 'Proceso', href: '#process' },
-  { label: 'Proyectos', href: '#work' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Contacto', href: '#contact' },
+  { label: 'Quiénes somos', href: '/#about' },
+  { label: 'Proceso', href: '/#process' },
+  { label: 'Proyectos', href: '/#work' },
+  { label: 'FAQ', href: '/#faq' },
+  { label: 'Contacto', href: '/#contact' },
 ] as const
 
 export default function Footer() {
@@ -100,8 +100,22 @@ export default function Footer() {
       {/* ===== Legal ===== */}
       <div className="mx-auto mt-12 flex max-w-[1320px] flex-col gap-4 border-t border-hodex-line-dark px-6 pt-6 text-small text-hodex-white/50 md:flex-row md:items-center md:justify-between">
         <p className="m-0">© {year} Hodex. Todos los derechos reservados.</p>
+        <nav aria-label="Enlaces legales" className="flex gap-6">
+          <a
+            href="/legal/aviso-legal"
+            className="transition-colors duration-300 hover:text-hodex-white"
+          >
+            Aviso legal
+          </a>
+          <a
+            href="/legal/privacidad"
+            className="transition-colors duration-300 hover:text-hodex-white"
+          >
+            Privacidad
+          </a>
+        </nav>
         <a
-          href="#top"
+          href="/#top"
           className="group inline-flex items-center gap-2 uppercase tracking-eyebrow text-eyebrow transition-colors duration-300 hover:text-hodex-white"
         >
           Volver arriba
