@@ -31,7 +31,10 @@ export default function Reveal({
           obs.disconnect()
         }
       },
-      { threshold: 0.15, rootMargin: '0px 0px -10% 0px' },
+      // threshold bajo + margen fijo en px: el elemento aparece en cuanto asoma
+      // 60px, también en móvil donde los bloques son altos (un threshold
+      // porcentual alto los dejaba invisibles hasta muy avanzado el scroll).
+      { threshold: 0.05, rootMargin: '0px 0px -60px 0px' },
     )
     obs.observe(el)
     return () => obs.disconnect()
