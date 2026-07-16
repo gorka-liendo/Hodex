@@ -6,7 +6,7 @@ WORKDIR /app
 # Instala todas las deps (incluye dev: typescript) con caché de capa.
 COPY package*.json ./
 RUN npm ci
-COPY tsconfig.json ./
+COPY tsconfig.json tsconfig.build.json ./
 COPY src ./src
 RUN npm run build
 

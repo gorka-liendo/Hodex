@@ -25,6 +25,8 @@ export interface EmailMessage {
   subject: string
   text: string
   replyTo?: string
+  /** Destinatario. Por defecto, CONTACT_TO (buzón interno del equipo). */
+  to?: string
 }
 
 /**
@@ -56,7 +58,7 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
       },
       body: JSON.stringify({
         from: env.CONTACT_FROM ?? env.CONTACT_TO,
-        to: [env.CONTACT_TO],
+        to: [message.to ?? env.CONTACT_TO],
         subject: message.subject,
         text: message.text,
         ...(message.replyTo ? { reply_to: message.replyTo } : {}),
@@ -82,7 +84,7 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
 
   await tx.sendMail({
     from: env.CONTACT_FROM ?? env.CONTACT_TO,
-    to: env.CONTACT_TO,
+    to: message.to ?? env.CONTACT_TO,
     subject: message.subject,
     text: message.text,
     ...(message.replyTo ? { replyTo: message.replyTo } : {}),
