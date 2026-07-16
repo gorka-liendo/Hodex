@@ -15,7 +15,9 @@ function App() {
 
       <main>
         {/* HERO — video de fondo */}
-        <section className="relative flex min-h-screen flex-col justify-end overflow-hidden bg-hodex-black pb-20 pt-40 text-hodex-white">
+        {/* min-h-svh (small viewport height): en móvil, 100vh incluye la barra
+            de URL del navegador y el contenido saltaba al colapsarse */}
+        <section className="relative flex min-h-svh flex-col justify-end overflow-hidden bg-hodex-black pb-20 pt-40 text-hodex-white">
           <video
             autoPlay
             muted

@@ -45,7 +45,7 @@ export default function Header() {
         <nav
           className={`flex items-center justify-between border border-hodex-line px-5 backdrop-blur-xl transition-all duration-500 ease-out md:px-7 ${
             scrolled
-              ? 'bg-hodex-white/85 py-2.5 shadow-[0_8px_30px_rgba(17,16,16,0.08)]'
+              ? 'bg-hodex-white/95 py-2.5 shadow-[0_8px_30px_rgba(17,16,16,0.08)]'
               : 'bg-hodex-white/60 py-3.5 shadow-[0_4px_20px_rgba(17,16,16,0.04)]'
           }`}
         >
