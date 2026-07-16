@@ -53,10 +53,10 @@ export default function Footer() {
               </div>
               <p className="m-0">
                 <a
-                  href="mailto:contact@hodex.es"
+                  href="mailto:team@hodex.es"
                   className="text-[15px] text-hodex-white transition-opacity duration-300 hover:opacity-70"
                 >
-                  contact@hodex.es
+                  team@hodex.es
                 </a>
               </p>
               <div className="mb-3 mt-6 text-eyebrow uppercase tracking-eyebrow text-hodex-white/50">
