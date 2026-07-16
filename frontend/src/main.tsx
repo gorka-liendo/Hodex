@@ -1,32 +1,13 @@
-import { StrictMode, useEffect } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import './index.css'
 import App from './App.tsx'
+import ScrollToHash from './components/ScrollToHash.tsx'
 import AvisoLegal from './pages/AvisoLegal.tsx'
 import Privacidad from './pages/Privacidad.tsx'
 import NotFound from './pages/NotFound.tsx'
-
-/**
- * ScrollToHash — con router, al navegar a "/#seccion" desde otra página el
- * ancla aún no existe cuando el navegador intenta el scroll. Reintenta tras
- * el render (doble rAF) para aterrizar en la sección correcta.
- */
-function ScrollToHash() {
-  const { hash, pathname } = useLocation()
-
-  useEffect(() => {
-    if (!hash) return
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' })
-      }),
-    )
-  }, [hash, pathname])
-
-  return null
-}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
