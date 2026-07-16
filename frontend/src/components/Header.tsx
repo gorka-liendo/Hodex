@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
  */
 
 const LINKS = [
+  { label: 'About', href: '#about' },
   { label: 'Work', href: '#work' },
   { label: 'Partners', href: '#partners' },
   { label: 'Clients', href: '#clients' },
@@ -43,7 +44,7 @@ export default function Header() {
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4">
       <div
-        className={`pointer-events-auto mt-3 w-full max-w-6xl transition-all duration-700 ease-out md:mt-5 ${
+        className={`pointer-events-auto mt-3 w-full max-w-[1320px] transition-all duration-700 ease-out md:mt-5 ${
           mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
         }`}
       >

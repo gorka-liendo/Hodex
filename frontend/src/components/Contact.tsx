@@ -66,7 +66,7 @@ export default function Contact() {
 
   return (
     <section id="contact" className="bg-hodex-black py-24 text-hodex-white md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-[1320px] px-6">
         <Reveal>
           <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">
             Get in touch

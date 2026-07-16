@@ -55,7 +55,13 @@ const PROJECTS: Project[] = [
 
 function BrowserMock({ project }: { project: Project }) {
   return (
-    <div className="overflow-hidden border border-hodex-line bg-hodex-off-white">
+    /* Toda la "pantalla" es clicable y lleva al proyecto, igual que el enlace de texto */
+    <a
+      href={project.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`Visitar ${project.domain}`}
+      className="block overflow-hidden border border-hodex-line bg-hodex-off-white transition-shadow duration-500 hover:shadow-[0_16px_50px_rgba(17,16,16,0.12)]">
       {/* Barra del navegador — puntos cuadrados (radius 0, detalle de marca) */}
       <div className="flex items-center gap-1.5 border-b border-hodex-line px-4 py-3">
         <span className="h-2 w-2 bg-hodex-black/20" />
@@ -74,7 +80,7 @@ function BrowserMock({ project }: { project: Project }) {
           className="h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
         />
       </div>
-    </div>
+    </a>
   )
 }
 
@@ -144,7 +150,7 @@ function ProjectRow({ project, reverse }: { project: Project; reverse: boolean }
 export default function Work() {
   return (
     <section id="work" className="border-b border-hodex-line py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-[1320px] px-6">
         <Reveal>
           <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-gray">
             Selected work
