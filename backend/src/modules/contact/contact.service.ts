@@ -1,3 +1,4 @@
+import { env } from '../../config/env.js'
 import { logger } from '../../lib/logger.js'
 import { sendEmail } from '../../services/email.js'
 import type { ContactInput } from './contact.schema.js'
@@ -37,4 +38,31 @@ export async function submitContact(input: ContactInput): Promise<void> {
       .filter((line) => line !== null)
       .join('\n'),
   })
+
+  // Confirmación al remitente. Si falla, no tumbamos la petición: su mensaje
+  // ya está en nuestro buzón, que es lo importante.
+  try {
+    await sendEmail({
+      to: input.email,
+      // Las respuestas del cliente van al buzón del equipo, no al remitente técnico.
+      replyTo: env.CONTACT_TO,
+      subject: 'Hemos recibido tu mensaje — Hodex',
+      text: [
+        `Hola ${input.name},`,
+        '',
+        'Gracias por escribirnos. Hemos recibido tu mensaje y te responderemos',
+        'en un plazo máximo de 24–48 horas laborables.',
+        '',
+        'Copia de tu mensaje:',
+        `«${input.message}»`,
+        '',
+        'Si quieres añadir algo mientras tanto, responde directamente a este email.',
+        '',
+        '— El equipo de Hodex',
+        'https://www.hodex.es',
+      ].join('\n'),
+    })
+  } catch (err) {
+    logger.warn({ err, email: input.email }, 'No se pudo enviar la confirmación al remitente')
+  }
 }
