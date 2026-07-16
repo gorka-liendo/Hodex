@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .vercel
 .env*
+
+# Media original sin comprimir — solo en local, no se versiona ni se despliega
+media-src/
