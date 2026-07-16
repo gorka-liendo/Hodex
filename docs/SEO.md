@@ -90,6 +90,41 @@ Todo esto ya está hecho en el repo. Referencias por archivo para encontrarlo.
   con TXT en DNS (Infomaniak), sitemap enviado, indexación solicitada.
   Cuenta: la Google account creada sobre `team@hodex.es`.
 
+### Estado por proyecto (16 jul 2026)
+
+El mismo kit técnico se aplicó a las tres webs. Todas con propiedad de
+dominio verificada en Search Console (cuenta `team@hodex.es`) y sitemap
+en estado "Correcto":
+
+| | hodex.es | golink.es | mytrainerhub.es |
+|---|---|---|---|
+| Sitemap | ✅ 1 pág. | ✅ 2 págs. | ✅ 13 págs. |
+| robots.txt | ✅ | ✅ (bloquea app/auth) | ✅ (bloquea app/auth) |
+| Canonical + OG + og-image | ✅ | ✅ | ✅ por ruta (`<Seo>` React 19) |
+| JSON-LD | Organization + FAQPage | WebSite | — |
+| Indexación | Solicitada | Ya indexada por Google | Solicitada |
+
+MyTrainerHub tiene la mejor arquitectura (SEO dinámico por ruta) — el
+patrón a copiar si Hodex o GoLink crecen a multipágina.
+
+### Trucos de Search Console aprendidos
+
+- **"No se ha podido obtener"** en un sitemap recién enviado: casi siempre
+  es que Google aún no lo ha intentado leer (columna "Última lectura"
+  vacía). Se resuelve solo en 24-48 h. No tocar nada.
+- **"Página con redirección"** al inspeccionar: estás inspeccionando la
+  variante que redirige (apex o http). Inspecciona siempre la canónica
+  exacta (`https://www.` + dominio).
+- El botón **"Solicitar indexación" aparece siempre**, esté la página
+  indexada o no. Si ya está indexada, sirve para pedir re-rastreo tras
+  cambios importantes.
+- "Solicitar indexación" tiene **cuota diaria** (~10-12/día por propiedad)
+  y a veces falla con un error genérico por saturación — reintentar más
+  tarde. El sitemap es la vía fiable; el botón solo acelera.
+- **Emails de Google que importan**: "Problema de indexación detectado",
+  "Acción manual" y el resumen mensual de rendimiento. Los de "primeros
+  pasos" / "consejos" son onboarding automático — ignorables.
+
 ---
 
 ## 3. Rutina de mantenimiento
