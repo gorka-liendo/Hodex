@@ -77,6 +77,7 @@ export default function Contact() {
           company: (fd.get('company') as string) || undefined,
           message: fd.get('message'),
           intent,
+          consent: fd.get('consent') === 'on',
         }),
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -237,6 +238,30 @@ export default function Contact() {
                     className={`${FIELD_CLASS} resize-none`}
                   />
                 </div>
+
+                {/* Consentimiento RGPD — casilla obligatoria, SIN marcar por
+                    defecto (requisito AEPD) + cláusula de primera capa */}
+                <label className="flex cursor-pointer items-start gap-3 text-small leading-body text-hodex-white/55">
+                  <input
+                    type="checkbox"
+                    name="consent"
+                    required
+                    className="mt-1 h-4 w-4 shrink-0 cursor-pointer appearance-none border border-hodex-line-dark bg-transparent transition-colors duration-200 checked:border-hodex-white checked:bg-hodex-white"
+                  />
+                  <span>
+                    He leído y acepto la{' '}
+                    <a
+                      href="/legal/privacidad"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-hodex-white underline underline-offset-2"
+                    >
+                      política de privacidad
+                    </a>
+                    . Tus datos los tratará Hodex con la única finalidad de
+                    responder a tu consulta.
+                  </span>
+                </label>
 
                 <button
                   type="submit"

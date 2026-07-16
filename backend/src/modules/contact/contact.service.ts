@@ -30,6 +30,7 @@ export async function submitContact(input: ContactInput): Promise<void> {
       `Nombre:    ${input.name}`,
       `Email:     ${input.email}`,
       input.company ? `Empresa:   ${input.company}` : null,
+      `Consentimiento: aceptado (política de privacidad) — ${new Date().toISOString()}`,
       '',
       input.message,
     ]

@@ -10,11 +10,11 @@ import { useEffect, useState } from 'react'
  */
 
 const LINKS = [
-  { label: 'About', href: '#about' },
-  { label: 'Process', href: '#process' },
-  { label: 'Work', href: '#work' },
-  { label: 'FAQ', href: '#faq' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'About', href: '/#about' },
+  { label: 'Process', href: '/#process' },
+  { label: 'Work', href: '/#work' },
+  { label: 'FAQ', href: '/#faq' },
+  { label: 'Contact', href: '/#contact' },
 ] as const
 
 export default function Header() {
@@ -50,7 +50,7 @@ export default function Header() {
           }`}
         >
           {/* Wordmark */}
-          <a href="#top" className="flex items-center gap-2 transition-opacity hover:opacity-70">
+          <a href="/#top" className="flex items-center gap-2 transition-opacity hover:opacity-70">
             <img
               src="/Honma_Interior_logo.svg"
               alt="Hodex"
@@ -78,7 +78,7 @@ export default function Header() {
 
           {/* CTA desktop (negro, nunca cobre) */}
           <a
-            href="#contact"
+            href="/#contact"
             className="hidden items-center bg-hodex-black px-5 py-2.5 text-eyebrow uppercase tracking-eyebrow text-hodex-white transition-all duration-300 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(17,16,16,0.25)] md:inline-flex"
           >
             Let&rsquo;s talk
@@ -136,7 +136,7 @@ export default function Header() {
           </ul>
           <div className="px-5 pb-5 pt-2">
             <a
-              href="#contact"
+              href="/#contact"
               onClick={() => setOpen(false)}
               className="block bg-hodex-black py-4 text-center text-eyebrow uppercase tracking-eyebrow text-hodex-white transition-opacity hover:opacity-90"
             >
