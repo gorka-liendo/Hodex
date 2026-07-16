@@ -1,0 +1,34 @@
+# Override de DESARROLLO: sustituye el nginx del frontend por el dev server de
+# Vite con hot reload (HMR). El código se monta como volumen, así que los
+# cambios en frontend/ se reflejan al instante sin reconstruir la imagen.
+#
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# El backend se levanta igual que en producción; Vite hace proxy de /api hacia
+# él dentro de la red de compose (ver vite.config.ts).
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    image: hodex-frontend-dev
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+    ports: !override
+      - "5173:5173"
+    volumes:
+      # Código fuente en vivo…
+      - ./frontend:/app
+      # …pero preservando los node_modules instalados en la imagen (los del
+      # host podrían ser de otra plataforma y además el bind mount es lento).
+      - /app/node_modules
+    environment:
+      # Dentro de la red de compose el backend se resuelve por nombre de servicio.
+      VITE_API_PROXY_TARGET: http://backend:4000
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5173/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 15s
