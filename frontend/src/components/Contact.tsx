@@ -8,8 +8,8 @@ import Reveal from './Reveal'
  * - Inputs de solo línea inferior (border-b, transparente, focus → borde blanco).
  * - CTA cobre como ÚNICO acento de color de la pantalla (regla "cobre 1× por pantalla").
  *
- * Sin backend: el envío muestra un estado de confirmación en cliente. A conectar
- * luego con email/API.
+ * Envía a POST /api/contact (backend Express + nodemailer). En dev, Vite hace
+ * proxy de /api al backend; en producción lo hace nginx.
  */
 
 type Intent = {
@@ -53,15 +53,41 @@ export default function Contact() {
   const [intent, setIntent] = useState<string | null>(null)
   const [intentError, setIntentError] = useState(false)
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [name, setName] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!intent) {
       setIntentError(true)
       return
     }
-    setSent(true)
+
+    const fd = new FormData(e.currentTarget)
+    setSending(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: fd.get('name'),
+          email: fd.get('email'),
+          company: (fd.get('company') as string) || undefined,
+          message: fd.get('message'),
+          intent,
+        }),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      setSent(true)
+    } catch {
+      setError(
+        'No se ha podido enviar el mensaje. Inténtalo de nuevo en un momento o escríbenos a team@hodex.es.',
+      )
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -214,13 +240,20 @@ export default function Contact() {
 
                 <button
                   type="submit"
-                  className="group mt-2 inline-flex items-center gap-2 self-start bg-copper-gradient px-7 py-4 text-eyebrow font-semibold uppercase tracking-eyebrow text-hodex-white transition-all duration-300 hover:-translate-y-px hover:shadow-[0_10px_30px_rgba(180,56,1,0.35)]"
+                  disabled={sending}
+                  className="group mt-2 inline-flex items-center gap-2 self-start bg-copper-gradient px-7 py-4 text-eyebrow font-semibold uppercase tracking-eyebrow text-hodex-white transition-all duration-300 hover:-translate-y-px hover:shadow-[0_10px_30px_rgba(180,56,1,0.35)] disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none"
                 >
-                  Enviar mensaje
+                  {sending ? 'Enviando…' : 'Enviar mensaje'}
                   <span className="transition-transform duration-300 group-hover:translate-x-1">
                     &rarr;
                   </span>
                 </button>
+
+                {error && (
+                  <p role="alert" className="m-0 text-small text-hodex-white/70">
+                    {error}
+                  </p>
+                )}
               </form>
             </Reveal>
           </div>
