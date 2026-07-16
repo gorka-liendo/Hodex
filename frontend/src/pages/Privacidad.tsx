@@ -5,8 +5,8 @@ import LegalLayout, { LegalSection } from './LegalLayout'
  * LOPDGDD para los datos recogidos vía formulario de contacto: responsable,
  * finalidad, base legal, destinatarios/encargados, conservación y derechos.
  *
- * ⚠️ PLACEHOLDERS PENDIENTES antes de considerar la página conforme:
- * [RAZÓN SOCIAL], [CIF], [DOMICILIO SOCIAL].
+ * NOTA: cuando Hodex se constituya como sociedad, añadir aquí razón social
+ * y CIF del responsable.
  */
 export default function Privacidad() {
   return (
@@ -18,18 +18,19 @@ export default function Privacidad() {
       <LegalSection title="1. Responsable del tratamiento">
         <ul>
           <li>
-            <b>Responsable:</b> [RAZÓN SOCIAL]
+            <b>Responsable:</b> Hodex
           </li>
           <li>
-            <b>CIF:</b> [CIF]
-          </li>
-          <li>
-            <b>Domicilio:</b> [DOMICILIO SOCIAL]
+            <b>Ubicación:</b> Castro Urdiales (Cantabria), España
           </li>
           <li>
             <b>Email:</b> <a href="mailto:team@hodex.es">team@hodex.es</a>
           </li>
         </ul>
+        <p>
+          El email indicado es el canal para cualquier cuestión relacionada
+          con el tratamiento de tus datos.
+        </p>
       </LegalSection>
 
       <LegalSection title="2. Qué datos recogemos">

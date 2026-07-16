@@ -5,8 +5,8 @@ import LegalLayout, { LegalSection } from './LegalLayout'
  * web con actividad económica: identificación del titular, condiciones de uso,
  * propiedad intelectual y legislación aplicable.
  *
- * ⚠️ PLACEHOLDERS PENDIENTES antes de considerar la página conforme:
- * [RAZÓN SOCIAL], [CIF], [DOMICILIO SOCIAL], [DATOS REGISTRALES].
+ * NOTA: cuando Hodex se constituya como sociedad, añadir aquí razón social,
+ * CIF y datos registrales (obligatorio por LSSI art. 10).
  */
 export default function AvisoLegal() {
   return (
@@ -19,17 +19,10 @@ export default function AvisoLegal() {
         </p>
         <ul>
           <li>
-            <b>Razón social:</b> [RAZÓN SOCIAL]
+            <b>Titular:</b> Hodex
           </li>
           <li>
-            <b>CIF:</b> [CIF]
-          </li>
-          <li>
-            <b>Domicilio social:</b> [DOMICILIO SOCIAL]
-          </li>
-          <li>
-            <b>Datos registrales:</b> [DATOS REGISTRALES — Registro Mercantil,
-            tomo, folio, hoja]
+            <b>Ubicación:</b> Castro Urdiales (Cantabria), España
           </li>
           <li>
             <b>Email de contacto:</b>{' '}
@@ -39,6 +32,10 @@ export default function AvisoLegal() {
             <b>Sitio web:</b> https://www.hodex.es
           </li>
         </ul>
+        <p>
+          Para cualquier comunicación relativa a este sitio web, el canal de
+          contacto es el email indicado.
+        </p>
       </LegalSection>
 
       <LegalSection title="2. Objeto">
