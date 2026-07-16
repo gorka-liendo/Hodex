@@ -66,33 +66,9 @@ function App() {
         {/* PHILOSOPHY — cita con ghost wordmark */}
         <Philosophy />
 
-        <section id="partners" className="border-b border-hodex-line py-24">
-          <div className="mx-auto max-w-[1320px] px-6">
-            <Reveal>
-              <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-gray">
-                Trusted by
-                <span className="h-px max-w-[220px] flex-1 bg-hodex-line" />
-              </div>
-              <h2 className="mt-6 font-display text-h2 font-light leading-tight">
-                Partners
-              </h2>
-            </Reveal>
-          </div>
-        </section>
-
-        <section id="clients" className="border-b border-hodex-line bg-hodex-off-white py-24">
-          <div className="mx-auto max-w-[1320px] px-6">
-            <Reveal>
-              <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-gray">
-                Feedback
-                <span className="h-px max-w-[220px] flex-1 bg-hodex-line" />
-              </div>
-              <h2 className="mt-6 font-display text-h2 font-light leading-tight">
-                Clientes
-              </h2>
-            </Reveal>
-          </div>
-        </section>
+        {/* PARTNERS / CLIENTS — ocultos hasta tener contenido real.
+            Recuperar de git (commit 54d55c3 o anterior) cuando haya logos
+            y testimonios que enseñar. */}
 
         {/* CONTACT — formulario */}
         <Contact />
