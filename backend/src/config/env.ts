@@ -17,7 +17,10 @@ const envSchema = z.object({
   // Orígenes CORS separados por coma.
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
 
-  // Email (opcional).
+  // Email (opcional). Vía preferente: API HTTP de Resend (puerto 443 — los
+  // puertos SMTP salientes están bloqueados en muchos PaaS, Railway incluido).
+  RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
+  // Alternativa: SMTP clásico (nodemailer).
   SMTP_HOST: z.preprocess(emptyToUndefined, z.string().optional()),
   SMTP_PORT: z.preprocess(
     emptyToUndefined,
@@ -46,5 +49,5 @@ export const env = parsed.data
 
 /** True solo si hay lo mínimo para enviar email de verdad. */
 export const isEmailConfigured = Boolean(
-  env.SMTP_HOST && env.SMTP_PORT && env.CONTACT_TO,
+  env.CONTACT_TO && (env.RESEND_API_KEY || (env.SMTP_HOST && env.SMTP_PORT)),
 )
