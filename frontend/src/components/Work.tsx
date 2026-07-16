@@ -155,7 +155,7 @@ export default function Work() {
           <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-gray">
             Selected work
             <span className="h-px max-w-[220px] flex-1 bg-hodex-line" />
-            <span className="text-hodex-gray-light">02</span>
+            <span className="text-hodex-gray-light">03</span>
           </div>
           <h2 className="mt-6 font-display text-h2 font-light leading-tight tracking-headline">
             Proyectos

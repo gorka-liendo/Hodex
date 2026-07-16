@@ -11,17 +11,15 @@ import { useEffect, useState } from 'react'
 
 const LINKS = [
   { label: 'About', href: '#about' },
+  { label: 'Process', href: '#process' },
   { label: 'Work', href: '#work' },
+  { label: 'FAQ', href: '#faq' },
   { label: 'Contact', href: '#contact' },
 ] as const
 
 export default function Header() {
-  const [mounted, setMounted] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
-
-  // Animación de entrada.
-  useEffect(() => setMounted(true), [])
 
   // Elevación / compactado al hacer scroll.
   useEffect(() => {
@@ -41,11 +39,8 @@ export default function Header() {
 
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-4">
-      <div
-        className={`pointer-events-auto mt-3 w-full max-w-[1320px] transition-all duration-700 ease-out md:mt-5 ${
-          mounted ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
-        }`}
-      >
+      {/* Animación de entrada en CSS puro (motion-safe respeta reduced-motion) */}
+      <div className="pointer-events-auto mt-3 w-full max-w-[1320px] motion-safe:animate-fade-down md:mt-5">
         {/* ===== Barra ===== */}
         <nav
           className={`flex items-center justify-between border border-hodex-line px-5 backdrop-blur-xl transition-all duration-500 ease-out md:px-7 ${

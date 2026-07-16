@@ -78,6 +78,21 @@
     }
   }
 
+  /* Entrada del header al montar: fade + descenso sutil. Uso:
+     class="motion-safe:animate-fade-down". */
+  --animate-fade-down: fade-down 700ms ease-out both;
+
+  @keyframes fade-down {
+    from {
+      opacity: 0;
+      transform: translateY(-16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   /* ===== Radius — 0 en TODO el sistema. No hay variante redondeada. ======= */
   --radius-xs: 0px;
   --radius-sm: 0px;
