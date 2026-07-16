@@ -17,6 +17,10 @@ export function createApp(): Application {
 
   app.disable('x-powered-by')
 
+  // Detrás de un proxy (Railway, nginx): confiar en X-Forwarded-For para que
+  // express-rate-limit identifique la IP real del cliente.
+  app.set('trust proxy', 1)
+
   // Seguridad y CORS.
   app.use(helmet())
   app.use(
