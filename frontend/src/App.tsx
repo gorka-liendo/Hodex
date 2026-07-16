@@ -1,8 +1,10 @@
 import Header from './components/Header'
 import Reveal from './components/Reveal'
 import About from './components/About'
+import Process from './components/Process'
 import Work from './components/Work'
 import Philosophy from './components/Philosophy'
+import Faq from './components/Faq'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 
@@ -55,17 +57,35 @@ function App() {
                 </span>
               </p>
             </Reveal>
+            {/* CTA principal — único cobre de la pantalla */}
+            <Reveal delay={450}>
+              <a
+                href="#contact"
+                className="group mt-10 inline-flex items-center gap-2 bg-copper-gradient px-7 py-4 text-eyebrow font-semibold uppercase tracking-eyebrow text-hodex-white transition-all duration-300 hover:-translate-y-px hover:shadow-[0_10px_30px_rgba(180,56,1,0.35)]"
+              >
+                Book a strategy call
+                <span className="transition-transform duration-300 group-hover:translate-x-1">
+                  &rarr;
+                </span>
+              </a>
+            </Reveal>
           </div>
         </section>
 
         {/* ABOUT — quiénes somos */}
         <About />
 
+        {/* PROCESS — cómo trabajamos (acordeón oscuro) */}
+        <Process />
+
         {/* WORK — proyectos */}
         <Work />
 
         {/* PHILOSOPHY — cita con ghost wordmark */}
         <Philosophy />
+
+        {/* FAQ — preguntas frecuentes (acordeón claro) */}
+        <Faq />
 
         {/* PARTNERS / CLIENTS — ocultos hasta tener contenido real.
             Recuperar de git (commit 54d55c3 o anterior) cuando haya logos

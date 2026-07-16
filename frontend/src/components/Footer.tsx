@@ -9,7 +9,9 @@ import Reveal from './Reveal'
 
 const NAV = [
   { label: 'Quiénes somos', href: '#about' },
+  { label: 'Proceso', href: '#process' },
   { label: 'Proyectos', href: '#work' },
+  { label: 'FAQ', href: '#faq' },
   { label: 'Contacto', href: '#contact' },
 ] as const
 

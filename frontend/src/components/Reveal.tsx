@@ -15,17 +15,14 @@ export default function Reveal({
   className?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [inView, setInView] = useState(false)
+  // Sin animación si el usuario la ha desactivado (estado inicial, no efecto).
+  const [inView, setInView] = useState(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  )
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
-
-    // Sin animación si el usuario la ha desactivado.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setInView(true)
-      return
-    }
 
     const obs = new IntersectionObserver(
       ([entry]) => {
