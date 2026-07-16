@@ -8,3 +8,5 @@
 # Dependencies & build (por si acaso, además del frontend/.gitignore)
 node_modules/
 dist/
+.vercel
+.env*
