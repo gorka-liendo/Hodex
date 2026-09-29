@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { authApi, type SecondFactor } from '../api/auth'
 import { ApiError, setUnauthenticatedListener } from '../api/client'
+import { queryClient } from '../lib/queryClient'
 import { AuthContext, type AuthState } from './AuthContext'
 
 /**
@@ -46,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authApi.logout()
     } finally {
+      queryClient.clear() // Ningún dato de la sesión se queda en memoria.
       setState({ status: 'anonymous', reason: 'logout' })
     }
   }
@@ -64,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Si cualquier petición detecta que la sesión caducó, volvemos al login.
   useEffect(() => {
     setUnauthenticatedListener(() => {
+      queryClient.clear()
       setState((prev) =>
         prev.status === 'authenticated' ? { status: 'anonymous', reason: 'expired' } : prev,
       )

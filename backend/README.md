@@ -27,6 +27,7 @@ src/
 └── modules/              # Un módulo por dominio
     ├── admin/            # /api/admin: gateway + CSRF + sesión (router del panel)
     ├── auth/             # Login 2FA, sesiones, códigos de recuperación
+    ├── contacts/         # /api/admin/contacts: clientes y proveedores (NIF validado)
     ├── health/           # GET /api/health
     └── contact/          # POST /api/contact  (schema→service→controller→routes)
 ```

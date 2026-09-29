@@ -5,7 +5,7 @@ import { useAuth } from '../auth/useAuth'
 import { Eyebrow, IndexBox, Isotype } from '../components/brand'
 import { Button } from '../components/Button'
 import { Notice } from '../components/Notice'
-import { TextField } from '../components/TextField'
+import { TextField } from '../components/fields'
 import { useDocumentTitle } from '../hooks/useDocumentTitle'
 
 type Step = 'credentials' | 'code'

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, ScrollRestoration } from 'react-router-dom'
 import { useAuth, useSession } from '../auth/useAuth'
 import { Eyebrow, Isotype } from '../components/brand'
 import { Button } from '../components/Button'
@@ -186,6 +186,8 @@ export function AppShell() {
           <Outlet />
         </div>
       </main>
+      {/* Cada pantalla nueva empieza arriba; "atrás" recupera la posición. */}
+      <ScrollRestoration />
     </div>
   )
 }

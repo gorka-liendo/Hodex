@@ -4,6 +4,7 @@ import { noStore } from '../../middleware/noStore.js'
 import { requireSameOrigin } from '../../middleware/requireSameOrigin.js'
 import authRoutes from '../auth/auth.routes.js'
 import { requireAuth } from '../auth/auth.middleware.js'
+import contactsRoutes from '../contacts/contacts.routes.js'
 
 /**
  * Router del panel de gestión (/api/admin). Capas, en orden:
@@ -19,6 +20,6 @@ router.use(adminGateway, noStore, requireSameOrigin)
 router.use('/auth', authRoutes)
 
 router.use(requireAuth)
-// Aquí se montarán los módulos del panel (clientes, facturas, gastos…).
+router.use('/contacts', contactsRoutes)
 
 export default router

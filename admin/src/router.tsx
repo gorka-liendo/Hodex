@@ -1,15 +1,20 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { PublicOnly, RequireAuth } from './auth/guards'
 import { AppShell } from './layout/AppShell'
+import { ContactDetailPage } from './pages/contacts/ContactDetailPage'
+import { ContactFormPage } from './pages/contacts/ContactFormPage'
+import { ContactsPage } from './pages/contacts/ContactsPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage'
 import { NotFoundPage } from './pages/NotFoundPage'
+import { RouteErrorPage } from './pages/RouteErrorPage'
 import { SecurityPage } from './pages/SecurityPage'
 
 export const router = createBrowserRouter([
   {
     path: '/login',
+    errorElement: <RouteErrorPage />,
     element: (
       <PublicOnly>
         <LoginPage />
@@ -18,6 +23,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
+    errorElement: <RouteErrorPage />,
     element: (
       <RequireAuth>
         <AppShell />
@@ -25,21 +31,10 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <DashboardPage /> },
-      {
-        path: 'clientes',
-        element: (
-          <ModulePlaceholderPage
-            title="Clientes"
-            phase="01"
-            description="Tu cartera de clientes y proveedores en un solo sitio."
-            includes={[
-              'Ficha de cliente y proveedor con NIF/CIF validado',
-              'Historial de facturas y cobros por cliente',
-              'Notas y datos de contacto',
-            ]}
-          />
-        ),
-      },
+      { path: 'clientes', element: <ContactsPage /> },
+      { path: 'clientes/nuevo', element: <ContactFormPage /> },
+      { path: 'clientes/:id', element: <ContactDetailPage /> },
+      { path: 'clientes/:id/editar', element: <ContactFormPage /> },
       {
         path: 'facturas',
         element: (
