@@ -6,6 +6,10 @@ import { logger } from '../lib/logger.js'
 import * as schema from './schema/index.js'
 
 export type Database = NodePgDatabase<typeof schema>
+/** Transacción de Drizzle (mismo API que `Database`). */
+export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0]
+/** Cualquier cosa que pueda ejecutar consultas: la BD o una transacción. */
+export type DbExecutor = Database | Transaction
 
 let pool: pg.Pool | undefined
 let db: Database | undefined
@@ -19,7 +23,9 @@ export function getDb(): Database {
   if (db) return db
 
   if (!env.DATABASE_URL) {
-    throw new AppError(503, 'Base de datos no configurada.')
+    throw new AppError(503, 'Base de datos no configurada.', {
+      code: 'ServiceUnavailable',
+    })
   }
 
   pool = new pg.Pool({

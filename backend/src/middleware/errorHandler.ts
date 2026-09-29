@@ -24,7 +24,7 @@ export function errorHandler(
   if (err instanceof AppError) {
     if (err.statusCode >= 500) logger.error({ err }, err.message)
     res.status(err.statusCode).json({
-      error: err.name,
+      error: err.code,
       message: err.message,
       ...(err.details ? { details: err.details } : {}),
     })
