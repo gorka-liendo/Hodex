@@ -17,6 +17,16 @@ const envSchema = z.object({
   // Orígenes CORS separados por coma.
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
 
+  // Postgres (opcional hasta que el panel esté desplegado: la landing solo usa
+  // el formulario de contacto, que no necesita base de datos).
+  DATABASE_URL: z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .regex(/^postgres(ql)?:\/\//, 'Debe ser una URL postgres://')
+      .optional(),
+  ),
+
   // Email (opcional). Vía preferente: API HTTP de Resend (puerto 443 — los
   // puertos SMTP salientes están bloqueados en muchos PaaS, Railway incluido).
   RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
@@ -46,6 +56,9 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data
+
+/** True si hay base de datos configurada (requisito del panel de gestión). */
+export const isDatabaseConfigured = Boolean(env.DATABASE_URL)
 
 /** True solo si hay lo mínimo para enviar email de verdad. */
 export const isEmailConfigured = Boolean(

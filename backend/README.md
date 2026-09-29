@@ -18,6 +18,7 @@ src/
 ├── index.ts              # Arranque del servidor (+ graceful shutdown)
 ├── app.ts                # Construcción de la app Express (testable)
 ├── config/env.ts         # Carga y validación de variables de entorno
+├── db/                   # Postgres: client, migrate y schema/ (Drizzle)
 ├── lib/                  # Utilidades transversales (logger, AppError)
 ├── middleware/           # errorHandler, notFound, rateLimit
 ├── services/email.ts     # Servicio de email (SMTP o modo consola)
@@ -40,6 +41,28 @@ npm run dev               # desarrollo con recarga (tsx watch)
 
 Otros scripts: `npm run build` (compila a `dist/`), `npm start` (producción),
 `npm run typecheck`.
+
+## Base de datos
+
+**Postgres + Drizzle ORM.** El esquema vive en `src/db/schema/` y las migraciones
+SQL generadas en `drizzle/` (versionadas en git: se revisan como cualquier código).
+
+```bash
+docker compose up -d db          # (desde la raíz) Postgres local en 127.0.0.1:5434
+npm run db:migrate               # aplica migraciones pendientes
+npm run db:generate -- --name=x  # genera migración tras cambiar el esquema
+npm run db:studio                # explorador visual (solo local)
+```
+
+- **Producción (Railway):** las migraciones se aplican en el _pre-deploy_ con
+  `npm run db:migrate:prod`. Si fallan, la versión nueva no se publica.
+- **`audit_log` es de solo inserción:** un trigger rechaza UPDATE/DELETE/TRUNCATE.
+- **Tests de integración** (se omiten si no hay `TEST_DATABASE_URL`):
+
+  ```bash
+  docker compose exec db createdb -U hodex hodex_test   # una sola vez
+  TEST_DATABASE_URL=postgres://hodex:hodex_dev_only@localhost:5434/hodex_test npm test
+  ```
 
 ## Endpoints
 
