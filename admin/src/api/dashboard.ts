@@ -1,8 +1,25 @@
 import { api } from './client'
 
 export interface DashboardData {
-  month: { from: string; to: string; expensesBaseCents: number; expensesCount: number }
-  quarter: { from: string; to: string; quarter: number; year: number; deductibleVatCents: number }
+  month: {
+    from: string
+    to: string
+    expensesBaseCents: number
+    expensesCount: number
+    invoicedBaseCents: number
+    invoicedCount: number
+  }
+  quarter: {
+    from: string
+    to: string
+    quarter: number
+    year: number
+    outputVatCents: number
+    deductibleVatCents: number
+    /** Estimación del modelo 303: repercutido − soportado deducible. */
+    vatBalanceCents: number
+  }
+  receivables: { outstandingCents: number; outstandingCount: number; overdueCents: number; overdueCount: number }
   unpaidExpenses: { totalCents: number; count: number }
 }
 

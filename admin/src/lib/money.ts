@@ -66,3 +66,31 @@ export function applyRate(cents: number, rateBp: number): number {
   const rounded = Math.floor((Math.abs(product) + 5_000) / 10_000)
   return product < 0 ? -rounded : rounded
 }
+
+/**
+ * Cantidad escrita a mano → milésimas (la API guarda 1,5 como 1500). Hasta 3
+ * decimales, con coma o punto. Devuelve null si no es válida.
+ */
+export function parseQuantityToMilli(input: string): number | null {
+  const cleaned = input.trim().replace(/\s/g, '')
+  const match = /^(-?)(\d+)(?:[.,](\d{1,3}))?$/.exec(cleaned)
+  if (!match) return null
+  const milli = Number(match[2]) * 1_000 + Number((match[3] ?? '').padEnd(3, '0'))
+  if (!Number.isSafeInteger(milli)) return null
+  return match[1] ? -milli : milli
+}
+
+/** Milésimas → texto ("1500" → "1,5"; "2000" → "2"). */
+export function milliToInput(milli: number): string {
+  const sign = milli < 0 ? '-' : ''
+  const abs = Math.abs(milli)
+  const decimals = String(abs % 1_000).padStart(3, '0').replace(/0+$/, '')
+  return `${sign}${Math.floor(abs / 1_000)}${decimals ? `,${decimals}` : ''}`
+}
+
+/** Precio × cantidad en milésimas, redondeo mitad hacia fuera (igual que el servidor). */
+export function multiplyQuantity(unitCents: number, quantityMilli: number): number {
+  const product = unitCents * quantityMilli
+  const rounded = Math.floor((Math.abs(product) + 500) / 1_000)
+  return product < 0 ? -rounded : rounded
+}

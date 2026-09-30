@@ -133,7 +133,19 @@ export async function getInvoice(id: string) {
   const [lines, [client], rectifies, rectifiedBy] = await Promise.all([
     findLines(id),
     db
-      .select({ id: contacts.id, legalName: contacts.legalName, taxId: contacts.taxId, email: contacts.email, phone: contacts.phone })
+      .select({
+        id: contacts.id,
+        legalName: contacts.legalName,
+        tradeName: contacts.tradeName,
+        taxId: contacts.taxId,
+        addressLine: contacts.addressLine,
+        postalCode: contacts.postalCode,
+        city: contacts.city,
+        province: contacts.province,
+        country: contacts.country,
+        email: contacts.email,
+        phone: contacts.phone,
+      })
       .from(contacts)
       .where(eq(contacts.id, invoice.clientId)),
     invoice.rectifiesInvoiceId

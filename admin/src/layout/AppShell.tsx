@@ -22,7 +22,10 @@ const SECTIONS: Array<{ section: string; items: NavItem[] }> = [
   },
   {
     section: 'Cuenta',
-    items: [{ to: '/ajustes/seguridad', label: 'Seguridad' }],
+    items: [
+      { to: '/ajustes/empresa', label: 'Empresa' },
+      { to: '/ajustes/seguridad', label: 'Seguridad' },
+    ],
   },
 ]
 

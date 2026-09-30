@@ -10,9 +10,9 @@ import { formatCents } from '../lib/money'
 
 const ROADMAP = [
   { phase: '00', name: 'Base segura', detail: 'Acceso con 2FA, sesiones, auditoría', status: 'Lista' },
-  { phase: '01', name: 'Gestión', detail: 'Clientes, gastos y resumen', status: 'En curso' },
-  { phase: '02', name: 'Facturación', detail: 'Emisión, PDF, envío por email y WhatsApp', status: 'Siguiente' },
-  { phase: '03', name: 'Entrada', detail: 'Recepción de facturas por email', status: 'Pendiente' },
+  { phase: '01', name: 'Gestión', detail: 'Clientes, gastos y resumen', status: 'Lista' },
+  { phase: '02', name: 'Facturación', detail: 'Emisión, PDF, envío por email y WhatsApp', status: 'En curso' },
+  { phase: '03', name: 'Entrada', detail: 'Recepción de facturas por email', status: 'Siguiente' },
   { phase: '04', name: 'IA', detail: 'Lectura de facturas con Claude', status: 'Pendiente' },
   { phase: '05', name: 'Verifactu', detail: 'Cumplimiento con la AEAT', status: 'Pendiente' },
 ] as const
@@ -68,24 +68,43 @@ export function DashboardPage() {
           <QueryStatus error={dashboard.error} onRetry={() => void dashboard.refetch()} />
         ) : (
           <dl className="grid gap-px border border-hodex-line bg-hodex-line sm:grid-cols-2 xl:grid-cols-4">
-            <Kpi label="Facturado este mes" value="—" note="Llega con la facturación (fase 02)" />
+            <Kpi
+              label="Facturado este mes"
+              value={data ? formatCents(data.month.invoicedBaseCents) : '…'}
+              note={data ? `Base imponible · ${plural(data.month.invoicedCount, 'factura', 'facturas')}` : 'Base imponible'}
+              to="/facturas?period=month"
+            />
+            <Kpi
+              label="Pendiente de cobro"
+              value={data ? formatCents(data.receivables.outstandingCents) : '…'}
+              note={
+                !data
+                  ? 'Facturas sin cobrar'
+                  : data.receivables.overdueCount > 0
+                    ? <b className="font-semibold text-hodex-black">{`${plural(data.receivables.overdueCount, 'vencida', 'vencidas')} · ${formatCents(data.receivables.overdueCents)}`}</b>
+                    : `${plural(data.receivables.outstandingCount, 'factura', 'facturas')} sin cobrar`
+              }
+              to={data && data.receivables.overdueCount > 0 ? '/facturas?period=all&state=overdue' : '/facturas?period=all&state=unpaid'}
+            />
+            <Kpi
+              label={data ? `IVA a liquidar ${data.quarter.quarter}T` : 'IVA a liquidar'}
+              value={data ? formatCents(data.quarter.vatBalanceCents) : '…'}
+              note={
+                data
+                  ? `Repercutido ${formatCents(data.quarter.outputVatCents)} − soportado ${formatCents(data.quarter.deductibleVatCents)}`
+                  : 'Estimación del modelo 303'
+              }
+              to="/facturas?period=quarter"
+            />
             <Kpi
               label="Gastos este mes"
               value={data ? formatCents(data.month.expensesBaseCents) : '…'}
-              note={data ? `Base imponible · ${plural(data.month.expensesCount, 'gasto', 'gastos')}` : 'Base imponible'}
+              note={
+                data
+                  ? `Base · ${plural(data.month.expensesCount, 'gasto', 'gastos')}${data.unpaidExpenses.count > 0 ? ` · ${formatCents(data.unpaidExpenses.totalCents)} sin pagar` : ''}`
+                  : 'Base imponible'
+              }
               to="/gastos?period=month"
-            />
-            <Kpi
-              label={data ? `IVA soportado ${data.quarter.quarter}T` : 'IVA soportado'}
-              value={data ? formatCents(data.quarter.deductibleVatCents) : '…'}
-              note="Deducible en el trimestre"
-              to="/gastos"
-            />
-            <Kpi
-              label="Pendiente de pago"
-              value={data ? formatCents(data.unpaidExpenses.totalCents) : '…'}
-              note={data ? `${plural(data.unpaidExpenses.count, 'gasto', 'gastos')} sin pagar` : 'Gastos sin pagar'}
-              to="/gastos?period=all&status=unpaid"
             />
           </dl>
         )}

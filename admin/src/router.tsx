@@ -9,10 +9,13 @@ import { ExpenseDetailPage } from './pages/expenses/ExpenseDetailPage'
 import { ExpenseFormPage } from './pages/expenses/ExpenseFormPage'
 import { ExpensesPage } from './pages/expenses/ExpensesPage'
 import { LoginPage } from './pages/LoginPage'
-import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage'
+import { InvoiceDetailPage } from './pages/invoices/InvoiceDetailPage'
+import { InvoiceEditorPage } from './pages/invoices/InvoiceEditorPage'
+import { InvoicesPage } from './pages/invoices/InvoicesPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { RouteErrorPage } from './pages/RouteErrorPage'
 import { SecurityPage } from './pages/SecurityPage'
+import { CompanySettingsPage } from './pages/settings/CompanySettingsPage'
 
 export const router = createBrowserRouter([
   {
@@ -38,26 +41,15 @@ export const router = createBrowserRouter([
       { path: 'clientes/nuevo', element: <ContactFormPage /> },
       { path: 'clientes/:id', element: <ContactDetailPage /> },
       { path: 'clientes/:id/editar', element: <ContactFormPage /> },
-      {
-        path: 'facturas',
-        element: (
-          <ModulePlaceholderPage
-            title="Facturas"
-            phase="02"
-            description="Emisión y seguimiento de tus facturas."
-            includes={[
-              'Numeración correlativa y modelo preparado para Verifactu',
-              'PDF con la imagen de Hodex',
-              'Envío por email y WhatsApp',
-              'Control de cobros y vencimientos',
-            ]}
-          />
-        ),
-      },
+      { path: 'facturas', element: <InvoicesPage /> },
+      { path: 'facturas/nueva', element: <InvoiceEditorPage /> },
+      { path: 'facturas/:id', element: <InvoiceDetailPage /> },
+      { path: 'facturas/:id/editar', element: <InvoiceEditorPage /> },
       { path: 'gastos', element: <ExpensesPage /> },
       { path: 'gastos/nuevo', element: <ExpenseFormPage /> },
       { path: 'gastos/:id', element: <ExpenseDetailPage /> },
       { path: 'gastos/:id/editar', element: <ExpenseFormPage /> },
+      { path: 'ajustes/empresa', element: <CompanySettingsPage /> },
       { path: 'ajustes/seguridad', element: <SecurityPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],

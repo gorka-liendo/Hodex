@@ -50,4 +50,38 @@ describe.skipIf(!hasTestDatabase)('resumen', () => {
     expect(res.body.unpaidExpenses.totalCents - before.unpaidExpenses.totalCents).toBe(12_100)
     expect(res.body.unpaidExpenses.count - before.unpaidExpenses.count).toBe(1)
   })
+
+  it('suma lo facturado, el IVA repercutido y lo pendiente de cobro; el 303 es repercutido − soportado', async () => {
+    await panel.put('/settings/company', {
+      legalName: 'Hodex Studio SL',
+      taxId: 'B12345674',
+      addressLine: 'Calle Mayor 1',
+      postalCode: '48001',
+      city: 'Bilbao',
+      country: 'ES',
+    })
+    const client = (
+      await panel.post('/contacts', {
+        isClient: true,
+        isSupplier: false,
+        legalName: 'Cliente Resumen SL',
+        country: 'FR',
+        taxId: `FR${Date.now()}`,
+        addressLine: '1 Rue',
+        city: 'Paris',
+      })
+    ).body.id
+    const before = await getDashboard()
+    const lines = [{ description: 'Servicio', quantityMilli: 1_000, unitPriceCents: 100_000, vatRateBp: 2100 }]
+    const draft = (await panel.post('/invoices', { clientId: client, issueDate: todayInSpain(), lines })).body
+    await panel.post(`/invoices/${draft.id}/issue`).expect(200)
+    // Un borrador no cuenta.
+    await panel.post('/invoices', { clientId: client, issueDate: todayInSpain(), lines }).expect(201)
+
+    const after = (await panel.get('/dashboard')).body
+    expect(after.month.invoicedBaseCents - before.month.invoicedBaseCents).toBe(100_000)
+    expect(after.quarter.outputVatCents - before.quarter.outputVatCents).toBe(21_000)
+    expect(after.receivables.outstandingCents - before.receivables.outstandingCents).toBe(121_000)
+    expect(after.quarter.vatBalanceCents).toBe(after.quarter.outputVatCents - after.quarter.deductibleVatCents)
+  })
 })
