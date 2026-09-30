@@ -53,29 +53,45 @@ export interface InvoicePdfData {
 // ─── Maquetación ─────────────────────────────────────────────────────────────
 
 const PAGE = { width: 595.28, height: 841.89 } // A4 en puntos
-const MARGIN = 56
-const CONTENT_WIDTH = PAGE.width - MARGIN * 2
-const FOOTER_HEIGHT = 64
-const BOTTOM_LIMIT = PAGE.height - MARGIN - FOOTER_HEIGHT
+const MARGIN_X = 40 // 14 mm: aprovecha la hoja sin pegarse al borde
+const MARGIN_TOP = 40
+const CONTENT_WIDTH = PAGE.width - MARGIN_X * 2
+const RIGHT = PAGE.width - MARGIN_X
+/** Franja inferior: wordmark a sangre (cortado por el canto) y, encima, el pie. */
+const WORDMARK_VISIBLE = 58
+const FOOTER_TOP = PAGE.height - WORDMARK_VISIBLE - 50
+const FOOTER_HEIGHT = PAGE.height - FOOTER_TOP
+const BOTTOM_LIMIT = FOOTER_TOP - 18
 
-/** Columnas de la tabla de conceptos (x relativo al margen y ancho). */
+/** Columnas de la tabla (x relativo al margen). La primera es el índice 01, 02… */
 const COLUMNS = {
-  description: { x: 0, width: 239 },
-  quantity: { x: 247, width: 48 },
-  price: { x: 303, width: 68 },
-  vat: { x: 379, width: 36 },
-  amount: { x: 423, width: CONTENT_WIDTH - 423 },
+  index: { x: 0, width: 18 },
+  description: { x: 24, width: 243 },
+  quantity: { x: 275, width: 44 },
+  price: { x: 325, width: 68 },
+  vat: { x: 399, width: 36 },
+  amount: { x: 441, width: CONTENT_WIDTH - 441 },
 }
 
 type Doc = PDFKit.PDFDocument
+type TextOptions = PDFKit.Mixins.TextOptions
 
-function hairline(doc: Doc, y: number, x1 = MARGIN, x2 = PAGE.width - MARGIN) {
-  doc.save().moveTo(x1, y).lineTo(x2, y).lineWidth(0.5).strokeColor(BLACK).strokeOpacity(HAIRLINE_OPACITY).stroke().restore()
+/** Hairline de 1 px con la opacidad de la marca (o negra, para jerarquía). */
+function hairline(doc: Doc, y: number, x1 = MARGIN_X, x2 = RIGHT, strong = false) {
+  doc
+    .save()
+    .moveTo(x1, y)
+    .lineTo(x2, y)
+    .lineWidth(strong ? 0.75 : 0.5)
+    .strokeColor(BLACK)
+    .strokeOpacity(strong ? 1 : HAIRLINE_OPACITY)
+    .stroke()
+    .restore()
 }
 
 /** Etiqueta en mayúsculas con tracking ancho (el "eyebrow" de la marca). */
-function eyebrow(doc: Doc, text: string, x: number, y: number, options: PDFKit.Mixins.TextOptions = {}) {
-  doc.font('regular').fontSize(6.5).fillColor(GRAY).text(text.toUpperCase(), x, y, { characterSpacing: 1.3, lineBreak: false, ...options })
+function eyebrow(doc: Doc, text: string, x: number, y: number, options: TextOptions = {}, color = GRAY) {
+  doc.font('regular').fontSize(6.5).fillColor(color).text(text.toUpperCase(), x, y, { characterSpacing: 1.3, lineBreak: false, ...options })
 }
 
 function partyLines(party: PartySnapshot): string[] {
@@ -83,18 +99,17 @@ function partyLines(party: PartySnapshot): string[] {
     party.taxId ? `NIF ${party.taxId}` : null,
     party.addressLine,
     [party.postalCode, party.city].filter(Boolean).join(' ') || null,
-    party.province,
-    party.country !== 'ES' ? formatCountry(party.country) : null,
+    [party.province, party.country !== 'ES' ? formatCountry(party.country) : null].filter(Boolean).join(', ') || null,
     party.email,
   ].filter((line): line is string => Boolean(line))
 }
 
 function drawParty(doc: Doc, title: string, party: PartySnapshot, x: number, y: number, width: number): number {
   eyebrow(doc, title, x, y)
-  let cursor = y + 16
-  doc.font('medium').fontSize(9).fillColor(BLACK).text(party.legalName, x, cursor, { width })
-  cursor += doc.heightOfString(party.legalName, { width }) + 3
-  doc.font('regular').fontSize(8.5).fillColor(BLACK)
+  let cursor = y + 15
+  doc.font('medium').fontSize(10).fillColor(BLACK).text(party.legalName, x, cursor, { width })
+  cursor += doc.heightOfString(party.legalName, { width }) + 4
+  doc.font('regular').fontSize(8.5).fillColor(GRAY)
   for (const line of partyLines(party)) {
     doc.text(line, x, cursor, { width })
     cursor += doc.heightOfString(line, { width }) + 2
@@ -102,147 +117,193 @@ function drawParty(doc: Doc, title: string, party: PartySnapshot, x: number, y: 
   return cursor
 }
 
-function drawTableHeader(doc: Doc, y: number): number {
-  eyebrow(doc, 'Concepto', MARGIN + COLUMNS.description.x, y)
-  eyebrow(doc, 'Cant.', MARGIN + COLUMNS.quantity.x, y, { width: COLUMNS.quantity.width, align: 'right' })
-  eyebrow(doc, 'Precio', MARGIN + COLUMNS.price.x, y, { width: COLUMNS.price.width, align: 'right' })
-  eyebrow(doc, 'IVA', MARGIN + COLUMNS.vat.x, y, { width: COLUMNS.vat.width, align: 'right' })
-  eyebrow(doc, 'Importe', MARGIN + COLUMNS.amount.x, y, { width: COLUMNS.amount.width, align: 'right' })
-  hairline(doc, y + 14)
-  return y + 24
-}
-
+/** Cabecera: isotipo, título grande y rejilla con los datos clave. */
 function drawHeader(doc: Doc, data: InvoicePdfData): number {
-  // Isotipo + nombre comercial.
-  const scale = 20 / ISOTYPE_HEIGHT
-  doc.save().translate(MARGIN, MARGIN).scale(scale).path(ISOTYPE_PATH).fill(BLACK).restore()
-  doc.font('light').fontSize(17).fillColor(BLACK).text(data.issuer.tradeName ?? 'Hodex', MARGIN + 30, MARGIN + 1, { lineBreak: false })
+  const scale = 18 / ISOTYPE_HEIGHT
+  doc.save().translate(MARGIN_X, MARGIN_TOP).scale(scale).path(ISOTYPE_PATH).fill(BLACK).restore()
+  doc.font('light').fontSize(15).fillColor(BLACK).text(data.issuer.tradeName ?? 'Hodex', MARGIN_X + 27, MARGIN_TOP + 1, { lineBreak: false })
 
-  // Tipo, número y fechas, alineados a la derecha.
-  const right = { width: CONTENT_WIDTH, align: 'right' as const }
+  // Título display fino.
   const title = data.kind === 'rectifying' ? 'Factura rectificativa' : 'Factura'
-  eyebrow(doc, data.fullNumber ? title : `${title} · Borrador sin validez fiscal`, MARGIN, MARGIN, right)
-  doc.font('light').fontSize(20).fillColor(BLACK).text(data.fullNumber ?? 'Borrador', MARGIN, MARGIN + 11, { ...right, lineBreak: false })
-  doc.font('regular').fontSize(8.5).fillColor(GRAY)
-  doc.text(`Fecha ${formatDate(data.issueDate)}`, MARGIN, MARGIN + 40, right)
-  if (data.dueDate) doc.text(`Vencimiento ${formatDate(data.dueDate)}`, MARGIN, MARGIN + 52, right)
+  doc.font('light').fontSize(40).fillColor(BLACK).text(title, MARGIN_X - 2, MARGIN_TOP + 44, { lineBreak: false })
+  if (!data.fullNumber) {
+    eyebrow(doc, 'Borrador · sin validez fiscal', MARGIN_X, MARGIN_TOP + 104, {}, BLACK)
+  }
 
-  let y = MARGIN + 80
+  // Rejilla suiza: número, fecha, vencimiento y total.
+  const gridTop = MARGIN_TOP + 124
+  const cells: Array<[string, string, boolean]> = [
+    ['Número', data.fullNumber ?? 'Borrador', false],
+    ['Fecha', formatDate(data.issueDate), false],
+    ['Vencimiento', data.dueDate ? formatDate(data.dueDate) : '—', false],
+    ['Total', formatEuros(data.totalCents), true],
+  ]
+  const cellWidth = CONTENT_WIDTH / cells.length
+  hairline(doc, gridTop, MARGIN_X, RIGHT, true)
+  cells.forEach(([label, value, emphasis], i) => {
+    const x = MARGIN_X + cellWidth * i
+    if (i > 0) doc.save().moveTo(x, gridTop).lineTo(x, gridTop + 44).lineWidth(0.5).strokeColor(BLACK).strokeOpacity(HAIRLINE_OPACITY).stroke().restore()
+    const inner = i === 0 ? 0 : 12
+    eyebrow(doc, label, x + inner, gridTop + 10)
+    doc.font(emphasis ? 'medium' : 'regular').fontSize(11).fillColor(BLACK).text(value, x + inner, gridTop + 24, {
+      width: cellWidth - inner - 4,
+      lineBreak: false,
+    })
+  })
+  hairline(doc, gridTop + 44)
+  let y = gridTop + 44
+
   if (data.rectifies) {
+    y += 14
     const text = `Rectifica la factura ${data.rectifies.fullNumber ?? ''}${data.rectifies.reason ? ` · Motivo: ${data.rectifies.reason}` : ''}`
-    doc.save().moveTo(MARGIN, y).lineTo(MARGIN, y + 12).lineWidth(0.75).strokeColor(BLACK).stroke().restore()
-    doc.font('regular').fontSize(8.5).fillColor(BLACK).text(text, MARGIN + 10, y + 1, { width: CONTENT_WIDTH - 10 })
-    y += doc.heightOfString(text, { width: CONTENT_WIDTH - 10 }) + 16
+    doc.save().moveTo(MARGIN_X, y).lineTo(MARGIN_X, y + 12).lineWidth(0.75).strokeColor(BLACK).stroke().restore()
+    doc.font('regular').fontSize(8.5).fillColor(BLACK).text(text, MARGIN_X + 10, y + 1, { width: CONTENT_WIDTH - 10 })
+    y += doc.heightOfString(text, { width: CONTENT_WIDTH - 10 }) + 2
   }
 
   // Emisor y cliente.
-  hairline(doc, y)
-  const columnWidth = CONTENT_WIDTH / 2 - 16
-  const leftEnd = drawParty(doc, 'Emisor', data.issuer, MARGIN, y + 20, columnWidth)
-  const rightEnd = drawParty(doc, 'Cliente', data.client, MARGIN + CONTENT_WIDTH / 2 + 16, y + 20, columnWidth)
-  y = Math.max(leftEnd, rightEnd) + 16
-  hairline(doc, y)
-  return y + 24
+  y += 24
+  const columnWidth = CONTENT_WIDTH / 2 - 12
+  const leftEnd = drawParty(doc, 'Emisor', data.issuer, MARGIN_X, y, columnWidth)
+  const rightEnd = drawParty(doc, 'Facturar a', data.client, MARGIN_X + CONTENT_WIDTH / 2 + 12, y, columnWidth)
+  return Math.max(leftEnd, rightEnd) + 30
+}
+
+function drawTableHeader(doc: Doc, y: number): number {
+  const at = (column: { x: number; width: number }) => MARGIN_X + column.x
+  eyebrow(doc, 'Concepto', at(COLUMNS.description), y)
+  eyebrow(doc, 'Cant.', at(COLUMNS.quantity), y, { width: COLUMNS.quantity.width, align: 'right' })
+  eyebrow(doc, 'Precio', at(COLUMNS.price), y, { width: COLUMNS.price.width, align: 'right' })
+  eyebrow(doc, 'IVA', at(COLUMNS.vat), y, { width: COLUMNS.vat.width, align: 'right' })
+  eyebrow(doc, 'Importe', at(COLUMNS.amount), y, { width: COLUMNS.amount.width, align: 'right' })
+  hairline(doc, y + 14, MARGIN_X, RIGHT, true)
+  return y + 14
 }
 
 function drawLines(doc: Doc, data: InvoicePdfData, startY: number): number {
   let y = drawTableHeader(doc, startY)
-  doc.font('regular').fontSize(8.5).fillColor(BLACK)
 
-  for (const line of data.lines) {
+  data.lines.forEach((line, index) => {
+    doc.font('regular').fontSize(9)
     const descriptionHeight = doc.heightOfString(line.description, { width: COLUMNS.description.width })
-    const rowHeight = Math.max(descriptionHeight, 11) + 14
+    const rowHeight = Math.max(descriptionHeight, 11) + 18
     if (y + rowHeight > BOTTOM_LIMIT) {
       doc.addPage()
-      y = drawTableHeader(doc, MARGIN)
-      doc.font('regular').fontSize(8.5).fillColor(BLACK)
+      y = drawTableHeader(doc, MARGIN_TOP + 8)
     }
+    const top = y + 9
     const cell = (text: string, column: { x: number; width: number }) =>
-      doc.text(text, MARGIN + column.x, y + 6, { width: column.width, align: 'right', lineBreak: false })
-    doc.text(line.description, MARGIN + COLUMNS.description.x, y + 6, { width: COLUMNS.description.width })
+      doc.font('regular').fontSize(9).fillColor(BLACK).text(text, MARGIN_X + column.x, top, { width: column.width, align: 'right', lineBreak: false })
+
+    doc.font('regular').fontSize(7).fillColor(LIGHT_GRAY).text(String(index + 1).padStart(2, '0'), MARGIN_X, top + 1.5, { lineBreak: false })
+    doc.font('regular').fontSize(9).fillColor(BLACK).text(line.description, MARGIN_X + COLUMNS.description.x, top, { width: COLUMNS.description.width })
     cell(formatQuantity(line.quantityMilli), COLUMNS.quantity)
     cell(formatEuros(line.unitPriceCents), COLUMNS.price)
     cell(formatRate(line.vatRateBp), COLUMNS.vat)
     cell(formatEuros(line.baseCents), COLUMNS.amount)
     y += rowHeight
     hairline(doc, y)
-  }
-  return y + 20
+  })
+  return y + 24
 }
 
+/** Pago y notas a la izquierda; desglose y total (banda negra) a la derecha. */
 function drawTotals(doc: Doc, data: InvoicePdfData, startY: number) {
-  const width = 220
-  const x = PAGE.width - MARGIN - width
+  const width = 236
+  const x = RIGHT - width
+  const leftWidth = CONTENT_WIDTH - width - 36
   const rows: Array<[string, string]> = [
     ['Base imponible', formatEuros(data.baseCents)],
-    ...data.vatBreakdown.map(
-      (g): [string, string] => [`IVA ${formatRate(g.rateBp)} s/ ${formatEuros(g.baseCents)}`, formatEuros(g.vatCents)],
-    ),
+    ...data.vatBreakdown.map((g): [string, string] => [`IVA ${formatRate(g.rateBp)} s/ ${formatEuros(g.baseCents)}`, formatEuros(g.vatCents)]),
     ...(data.irpfRateBp > 0 ? [[`Retención IRPF ${formatRate(data.irpfRateBp)}`, formatEuros(-data.irpfCents)] as [string, string]] : []),
   ]
-  // Notas + IBAN a la izquierda.
-  const leftWidth = CONTENT_WIDTH - width - 32
-  const blockHeight = rows.length * 20 + 44
-  const notesHeight =
-    (data.notes ? doc.font('regular').fontSize(8.5).heightOfString(data.notes, { width: leftWidth }) + 12 : 0) +
-    (data.issuer.iban ? 32 : 0)
+  const totalsHeight = rows.length * 22 + 44
+  doc.font('regular').fontSize(8.5)
+  const notesHeight = data.notes ? doc.heightOfString(data.notes, { width: leftWidth }) + 30 : 0
+  const paymentHeight = data.issuer.iban ? 70 : 0
+
   let y = startY
-  if (y + Math.max(blockHeight, notesHeight) > BOTTOM_LIMIT) {
+  if (y + Math.max(totalsHeight, notesHeight + paymentHeight) > BOTTOM_LIMIT) {
     doc.addPage()
-    y = MARGIN
+    y = MARGIN_TOP + 8
   }
 
+  // Izquierda: forma de pago y notas.
   let leftY = y
-  if (data.notes) {
-    doc.font('regular').fontSize(8.5).fillColor(BLACK).text(data.notes, MARGIN, leftY, { width: leftWidth })
-    leftY += doc.heightOfString(data.notes, { width: leftWidth }) + 12
-  }
   if (data.issuer.iban) {
-    doc.font('regular').fontSize(8).fillColor(GRAY).text('Pago por transferencia a', MARGIN, leftY)
-    doc.font('regular').fontSize(8.5).fillColor(BLACK).text(data.issuer.iban.replace(/(.{4})(?=.)/g, '$1 '), MARGIN, leftY + 12)
+    eyebrow(doc, 'Forma de pago', MARGIN_X, leftY)
+    doc.font('regular').fontSize(8.5).fillColor(GRAY).text('Transferencia bancaria', MARGIN_X, leftY + 15)
+    doc.font('medium').fontSize(10).fillColor(BLACK).text(data.issuer.iban.replace(/(.{4})(?=.)/g, '$1 '), MARGIN_X, leftY + 28, { characterSpacing: 0.3 })
+    if (data.dueDate) {
+      doc.font('regular').fontSize(8.5).fillColor(GRAY).text(`Antes del ${formatDate(data.dueDate)}`, MARGIN_X, leftY + 44)
+    }
+    leftY += paymentHeight
+  }
+  if (data.notes) {
+    eyebrow(doc, 'Notas', MARGIN_X, leftY)
+    doc.font('regular').fontSize(8.5).fillColor(BLACK).text(data.notes, MARGIN_X, leftY + 15, { width: leftWidth })
   }
 
+  // Derecha: desglose.
   let rowY = y
   for (const [label, value] of rows) {
-    doc.font('regular').fontSize(8).fillColor(GRAY).text(label, x, rowY, { width: width - 80, lineBreak: false })
-    doc.font('regular').fontSize(8.5).fillColor(BLACK).text(value, x, rowY, { width, align: 'right', lineBreak: false })
-    rowY += 14
-    hairline(doc, rowY, x, x + width)
-    rowY += 6
+    doc.font('regular').fontSize(8.5).fillColor(GRAY).text(label, x, rowY, { width: width - 90, lineBreak: false })
+    doc.font('regular').fontSize(9).fillColor(BLACK).text(value, x, rowY, { width, align: 'right', lineBreak: false })
+    rowY += 15
+    hairline(doc, rowY, x, RIGHT)
+    rowY += 7
   }
-  eyebrow(doc, 'Total', x, rowY + 12)
-  doc.font('light').fontSize(18).fillColor(BLACK).text(formatEuros(data.totalCents), x, rowY + 4, { width, align: 'right', lineBreak: false })
+  // Total a pagar: banda negra, texto blanco.
+  const bandTop = rowY + 6
+  doc.save().rect(x, bandTop, width, 38).fill(BLACK).restore()
+  eyebrow(doc, 'Total a pagar', x + 14, bandTop + 16, {}, '#FFFFFF')
+  doc.font('light').fontSize(17).fillColor('#FFFFFF').text(formatEuros(data.totalCents), x, bandTop + 10, {
+    width: width - 14,
+    align: 'right',
+    lineBreak: false,
+  })
 }
 
-/** Pie en todas las páginas: texto legal, huella y número de página. */
+/** Pie en todas las páginas: texto legal, huella, página y wordmark a sangre. */
 function drawFooters(doc: Doc, data: InvoicePdfData) {
   const range = doc.bufferedPageRange()
   for (let i = range.start; i < range.start + range.count; i++) {
     doc.switchToPage(i)
-    // El pie va por debajo del margen inferior: evita que pdfkit abra otra página.
+    // Todo esto va por debajo del margen inferior: evita que pdfkit abra páginas.
     const originalBottom = doc.page.margins.bottom
     doc.page.margins.bottom = 0
-    const top = PAGE.height - MARGIN - FOOTER_HEIGHT + 20
+
+    // Wordmark HODEX a sangre: ocupa el ancho útil y el canto de la hoja lo
+    // corta (como en la landing). Casi transparente: firma, no ruido.
+    doc.save().fillOpacity(0.045)
+    doc.font('light').fontSize(148).fillColor(BLACK).text('HODEX', MARGIN_X - 8, PAGE.height - WORDMARK_VISIBLE - 22, {
+      lineBreak: false,
+      characterSpacing: -1.5,
+    })
+    doc.restore()
+
+    const top = FOOTER_TOP
     hairline(doc, top)
-    let y = top + 8
-    const width = CONTENT_WIDTH - 60
+    const width = CONTENT_WIDTH - 50
+    let y = top + 9
     const footer = data.issuer.invoiceFooter
     if (footer) {
-      doc.font('regular').fontSize(6.5).fillColor(GRAY).text(footer, MARGIN, y, { width, height: 22, ellipsis: true })
-      y += Math.min(doc.heightOfString(footer, { width }), 22) + 4
+      doc.font('regular').fontSize(6.5).fillColor(GRAY).text(footer, MARGIN_X, y, { width, height: 20, ellipsis: true })
+      y += Math.min(doc.heightOfString(footer, { width }), 20) + 4
     }
     if (data.hash) {
-      doc.font('regular').fontSize(6).fillColor(LIGHT_GRAY).text(`Huella ${data.hash}`, MARGIN, y, { width, lineBreak: false })
+      doc.font('regular').fontSize(6).fillColor(LIGHT_GRAY).text(`Huella ${data.hash}`, MARGIN_X, y, { width, lineBreak: false })
     }
-    doc.font('regular').fontSize(6.5).fillColor(GRAY).text(`${i + 1} / ${range.count}`, MARGIN, top + 8, {
+    doc.font('regular').fontSize(6.5).fillColor(GRAY).text(`${i + 1} / ${range.count}`, MARGIN_X, top + 9, {
       width: CONTENT_WIDTH,
       align: 'right',
       lineBreak: false,
     })
+
     // Cabecera corrida en las páginas de continuación: cada hoja se identifica sola.
     if (i > range.start) {
       const label = `${data.issuer.tradeName ?? 'Hodex'} · ${data.fullNumber ? `Factura ${data.fullNumber}` : 'Borrador de factura'} · continuación`
-      eyebrow(doc, label, MARGIN, MARGIN - 28)
+      eyebrow(doc, label, MARGIN_X, MARGIN_TOP - 20)
     }
     // Marca de agua en borradores: no puede confundirse con una factura real.
     if (!data.fullNumber) {
@@ -260,7 +321,7 @@ export function renderInvoicePdf(data: InvoicePdfData): Promise<Buffer> {
   const title = data.fullNumber ? `Factura ${data.fullNumber}` : 'Borrador de factura'
   const doc = new PDFDocument({
     size: 'A4',
-    margins: { top: MARGIN, bottom: MARGIN, left: MARGIN, right: MARGIN },
+    margins: { top: MARGIN_TOP, bottom: FOOTER_HEIGHT, left: MARGIN_X, right: MARGIN_X },
     bufferPages: true,
     lang: 'es-ES',
     info: {
