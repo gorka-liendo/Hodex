@@ -28,6 +28,8 @@ src/
     ├── admin/            # /api/admin: gateway + CSRF + sesión (router del panel)
     ├── auth/             # Login 2FA, sesiones, códigos de recuperación
     ├── contacts/         # /api/admin/contacts: clientes y proveedores (NIF validado)
+    ├── expenses/         # /api/admin/expenses: gastos (importes en céntimos, baja lógica)
+    ├── dashboard/        # /api/admin/dashboard: indicadores del resumen
     ├── health/           # GET /api/health
     └── contact/          # POST /api/contact  (schema→service→controller→routes)
 ```

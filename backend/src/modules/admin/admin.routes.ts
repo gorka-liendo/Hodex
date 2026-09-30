@@ -5,6 +5,8 @@ import { requireSameOrigin } from '../../middleware/requireSameOrigin.js'
 import authRoutes from '../auth/auth.routes.js'
 import { requireAuth } from '../auth/auth.middleware.js'
 import contactsRoutes from '../contacts/contacts.routes.js'
+import dashboardRoutes from '../dashboard/dashboard.routes.js'
+import expensesRoutes from '../expenses/expenses.routes.js'
 
 /**
  * Router del panel de gestión (/api/admin). Capas, en orden:
@@ -21,5 +23,7 @@ router.use('/auth', authRoutes)
 
 router.use(requireAuth)
 router.use('/contacts', contactsRoutes)
+router.use('/expenses', expensesRoutes)
+router.use('/dashboard', dashboardRoutes)
 
 export default router

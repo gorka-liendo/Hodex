@@ -5,6 +5,9 @@ import { ContactDetailPage } from './pages/contacts/ContactDetailPage'
 import { ContactFormPage } from './pages/contacts/ContactFormPage'
 import { ContactsPage } from './pages/contacts/ContactsPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { ExpenseDetailPage } from './pages/expenses/ExpenseDetailPage'
+import { ExpenseFormPage } from './pages/expenses/ExpenseFormPage'
+import { ExpensesPage } from './pages/expenses/ExpensesPage'
 import { LoginPage } from './pages/LoginPage'
 import { ModulePlaceholderPage } from './pages/ModulePlaceholderPage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -51,21 +54,10 @@ export const router = createBrowserRouter([
           />
         ),
       },
-      {
-        path: 'gastos',
-        element: (
-          <ModulePlaceholderPage
-            title="Gastos"
-            phase="01"
-            description="Facturas recibidas y gastos de la empresa."
-            includes={[
-              'Registro manual de gastos con su factura adjunta',
-              'Categorías y base, IVA y retención',
-              'Más adelante: lectura automática con IA',
-            ]}
-          />
-        ),
-      },
+      { path: 'gastos', element: <ExpensesPage /> },
+      { path: 'gastos/nuevo', element: <ExpenseFormPage /> },
+      { path: 'gastos/:id', element: <ExpenseDetailPage /> },
+      { path: 'gastos/:id/editar', element: <ExpenseFormPage /> },
       { path: 'ajustes/seguridad', element: <SecurityPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],

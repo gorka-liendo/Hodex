@@ -25,6 +25,16 @@ export const optionalEmail = z
     message: 'Email no válido',
   })
 
+/** Fecha de calendario `AAAA-MM-DD` real (rechaza 2026-02-30) entre 2000 y 2100. */
+export const isoDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Fecha no válida')
+  .refine((value) => {
+    const date = new Date(`${value}T00:00:00Z`)
+    const year = date.getUTCFullYear()
+    return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value) && year >= 2000 && year <= 2100
+  }, 'Fecha no válida')
+
 /** Número de página y tamaño, con límites para no permitir consultas enormes. */
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),

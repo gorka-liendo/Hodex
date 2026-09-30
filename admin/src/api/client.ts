@@ -45,7 +45,7 @@ export function setUnauthenticatedListener(listener: UnauthenticatedListener | n
   onUnauthenticated = listener
 }
 
-type Method = 'GET' | 'POST' | 'PUT'
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
 export type QueryParams = Record<string, string | number | undefined | null>
 
 function buildUrl(path: string, params?: QueryParams): string {
@@ -110,6 +110,7 @@ export const api = {
   get: <T>(path: string, params?: QueryParams) => request<T>('GET', buildUrl(path, params)),
   post: <T>(path: string, body: unknown = {}) => request<T>('POST', buildUrl(path), body),
   put: <T>(path: string, body: unknown) => request<T>('PUT', buildUrl(path), body),
+  delete: <T>(path: string) => request<T>('DELETE', buildUrl(path)),
 }
 
 /** Respuesta paginada estándar de la API. */

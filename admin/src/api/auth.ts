@@ -21,5 +21,6 @@ export const authApi = {
     api.post<{ user: { email: string } }>('/auth/login/verify', factor),
   session: () => api.get<SessionInfo>('/auth/session'),
   logout: () => api.post<void>('/auth/logout'),
+  reauth: (factor: SecondFactor) => api.post<void>('/auth/reauth', factor),
   logoutOthers: () => api.post<{ revoked: number }>('/auth/logout-others'),
 }

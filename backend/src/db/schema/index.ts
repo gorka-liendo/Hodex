@@ -2,3 +2,4 @@
 export * from './auth.js'
 export * from './audit.js'
 export * from './contacts.js'
+export * from './expenses.js'

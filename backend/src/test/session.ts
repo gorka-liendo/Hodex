@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import type { Application } from 'express'
 import request from 'supertest'
 import { getDb } from '../db/client.js'
+import { sha256Hex } from '../lib/crypto.js'
 import { generateTotpSecret } from '../lib/totp.js'
 import { createAdminUser } from '../modules/auth/adminUsers.service.js'
 import { SESSION_COOKIE } from '../modules/auth/auth.config.js'
@@ -30,9 +31,12 @@ export async function signedInPanel(app: Application) {
 
   return {
     userId,
+    /** Id de la sesión en la BD (SHA-256 del token), para manipularla en tests. */
+    sessionId: sha256Hex(token),
     get: (path: string) => withAuth(request(app).get(`/api/admin${path}`)),
     post: (path: string, body: object = {}) =>
       withAuth(request(app).post(`/api/admin${path}`)).send(body),
     put: (path: string, body: object) => withAuth(request(app).put(`/api/admin${path}`)).send(body),
+    delete: (path: string) => withAuth(request(app).delete(`/api/admin${path}`)),
   }
 }
