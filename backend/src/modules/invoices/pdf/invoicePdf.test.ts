@@ -173,7 +173,8 @@ describe.skipIf(!hasTestDatabase)('PDF de factura', () => {
     expect(res.headers['content-disposition']).toBe(`attachment; filename="borrador-${draft.id.slice(0, 8)}.pdf"`)
     const text = pdfText(res.body as Buffer)
     expect(text).toContain('Borrador') // en lugar del número
-    // Las etiquetas con tracking ancho se extraen con letras separadas: se compara sin espacios.
-    expect(text.replace(/\s/g, '')).toContain('BORRADORSINVALIDEZFISCAL')
+    // Las etiquetas con tracking ancho se extraen con letras separadas: se compara
+    // solo con letras (sin espacios ni signos como el punto medio).
+    expect(text.replace(/[^\p{L}]/gu, '')).toContain('BORRADORSINVALIDEZFISCAL')
   })
 })
