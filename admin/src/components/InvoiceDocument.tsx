@@ -59,7 +59,9 @@ export function InvoiceDocument(props: InvoiceDocumentProps) {
   const title = props.kind === 'rectifying' ? 'Factura rectificativa' : 'Factura'
 
   return (
-    <article className="flex flex-col gap-10 border border-hodex-line bg-hodex-white p-6 text-hodex-black md:p-12">
+    // Hoja A4 (210 × 297) con márgenes proporcionales a los del PDF (56 pt de
+    // 595 = 9,4 % del ancho). Si el contenido no cabe, la hoja crece.
+    <article className="mx-auto flex aspect-[210/297] w-full max-w-[794px] flex-col gap-10 border border-hodex-line bg-hodex-white p-[9.4%] text-hodex-black shadow-[0_8px_30px_rgba(17,16,16,0.06)]">
       <header className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <div className="flex items-center gap-3">
           <Isotype className="h-8 w-auto" />
@@ -157,7 +159,7 @@ export function InvoiceDocument(props: InvoiceDocumentProps) {
       </div>
 
       {(props.footer || props.hash) && (
-        <footer className="flex flex-col gap-2 border-t border-hodex-line pt-6 text-[11px] text-hodex-gray">
+        <footer className="mt-auto flex flex-col gap-2 border-t border-hodex-line pt-6 text-[11px] text-hodex-gray">
           {props.footer && <p className="whitespace-pre-line">{props.footer}</p>}
           {props.hash && <p className="break-all tabular-nums">Huella: {props.hash}</p>}
         </footer>

@@ -1,13 +1,12 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ApiError } from '../../api/client'
+import { ApiError, saveBlob } from '../../api/client'
 import { dashboardKeys } from '../../api/dashboard'
 import { invoiceKeys, invoicesApi, invoiceState, type Invoice } from '../../api/invoices'
 import { settingsApi, settingsKeys } from '../../api/settings'
 import { Eyebrow } from '../../components/brand'
 import { Button, LinkButton } from '../../components/Button'
-import { buttonClasses } from '../../components/buttonStyles'
 import { TextField } from '../../components/fields'
 import { InvoiceDocument } from '../../components/InvoiceDocument'
 import { QueryStatus } from '../../components/lists'
@@ -85,10 +84,7 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
           <div className="min-w-[200px] flex-1">
             <Eyebrow>{isDraft ? 'Vista previa' : 'Factura emitida'}</Eyebrow>
           </div>
-          {/* GET normal: la cookie de sesión viaja sola; el backend fija el nombre del archivo. */}
-          <a href={`/api/admin/invoices/${invoice.id}/pdf`} download className={buttonClasses('outline')}>
-            {isDraft ? 'Descargar borrador (PDF)' : 'Descargar PDF'}
-          </a>
+          <PdfDownloadButton invoiceId={invoice.id} label={isDraft ? 'Descargar borrador (PDF)' : 'Descargar PDF'} />
         </div>
         <InvoiceDocument
           fullNumber={invoice.fullNumber}
@@ -121,6 +117,27 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
       <p className="text-small text-hodex-gray-light">
         {invoice.issuedAt ? `Emitida: ${formatDateTime(invoice.issuedAt)}` : `Creada: ${formatDateTime(invoice.createdAt)}`}
       </p>
+    </div>
+  )
+}
+
+// ─── Descarga del PDF ────────────────────────────────────────────────────────
+
+/**
+ * Descarga controlada: si la sesión caducó o el servidor falla, avisa en vez
+ * de guardar un "PDF" que en realidad es un mensaje de error.
+ */
+function PdfDownloadButton({ invoiceId, label }: { invoiceId: string; label: string }) {
+  const download = useMutation({
+    mutationFn: () => invoicesApi.pdf(invoiceId),
+    onSuccess: ({ blob, filename }) => saveBlob(blob, filename),
+  })
+  return (
+    <div className="flex flex-col items-end gap-2">
+      <Button variant="outline" loading={download.isPending} loadingLabel="Generando PDF…" onClick={() => download.mutate()}>
+        {label}
+      </Button>
+      {download.error && <Notice>{errorMessage(download.error)}</Notice>}
     </div>
   )
 }

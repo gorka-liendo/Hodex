@@ -113,6 +113,7 @@ export const invoicesApi = {
   issue: (id: string) => api.post<Invoice>(`/invoices/${id}/issue`),
   setPayment: (id: string, paidOn: string | null) => api.post<Invoice>(`/invoices/${id}/payment`, { paidOn }),
   rectify: (id: string, reason: string) => api.post<Invoice>(`/invoices/${id}/rectify`, { reason }),
+  pdf: (id: string) => api.download(`/invoices/${id}/pdf`, 'application/pdf'),
 }
 
 /** Bajo `invoices`; el resumen también se invalida porque depende de ellas. */

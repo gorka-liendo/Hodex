@@ -106,7 +106,57 @@ async function request<T>(method: Method, url: string, body?: unknown): Promise<
   return data as T
 }
 
+/**
+ * Descarga un archivo (p. ej. un PDF) comprobando la respuesta: si la sesión
+ * caducó o hay un error, se lanza ApiError en vez de guardar un archivo roto.
+ */
+async function download(path: string, expectedType: string): Promise<{ blob: Blob; filename: string }> {
+  let response: Response
+  try {
+    response = await fetch(buildUrl(path), {
+      credentials: 'same-origin',
+      cache: 'no-store',
+      headers: { 'X-Hodex-Request': '1' },
+    })
+  } catch {
+    throw new ApiError(0, 'NetworkError', 'No se pudo conectar. Revisa tu conexión.')
+  }
+
+  if (!response.ok) {
+    const payload = ((await response.json().catch(() => null)) ?? {}) as { error?: string; message?: string }
+    const error = new ApiError(
+      response.status,
+      payload.error ?? 'UnknownError',
+      payload.message ?? 'No se pudo descargar el archivo.',
+    )
+    if (error.code === 'Unauthenticated') onUnauthenticated?.()
+    throw error
+  }
+  if (!response.headers.get('content-type')?.startsWith(expectedType)) {
+    throw new ApiError(response.status, 'UnexpectedContent', 'El servidor no devolvió el archivo esperado.')
+  }
+
+  // Nombre del archivo según el servidor (Content-Disposition), con respaldo.
+  const disposition = response.headers.get('content-disposition') ?? ''
+  const filename = /filename="([^"]+)"/.exec(disposition)?.[1] ?? 'documento'
+  return { blob: await response.blob(), filename }
+}
+
+/** Guarda un Blob en el equipo con su nombre (descarga normal del navegador). */
+export function saveBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.append(link)
+  link.click()
+  link.remove()
+  // Se libera después: algunos navegadores leen el blob de forma asíncrona.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000)
+}
+
 export const api = {
+  download,
   get: <T>(path: string, params?: QueryParams) => request<T>('GET', buildUrl(path, params)),
   post: <T>(path: string, body: unknown = {}) => request<T>('POST', buildUrl(path), body),
   put: <T>(path: string, body: unknown) => request<T>('PUT', buildUrl(path), body),
