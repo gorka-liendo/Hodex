@@ -7,6 +7,7 @@ import { invoiceKeys, invoicesApi, invoiceState, type Invoice } from '../../api/
 import { settingsApi, settingsKeys } from '../../api/settings'
 import { Eyebrow } from '../../components/brand'
 import { Button, LinkButton } from '../../components/Button'
+import { buttonClasses } from '../../components/buttonStyles'
 import { TextField } from '../../components/fields'
 import { InvoiceDocument } from '../../components/InvoiceDocument'
 import { QueryStatus } from '../../components/lists'
@@ -80,7 +81,15 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
       )}
 
       <section className="flex flex-col gap-6">
-        <Eyebrow>{isDraft ? 'Vista previa' : 'Factura emitida'}</Eyebrow>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="min-w-[200px] flex-1">
+            <Eyebrow>{isDraft ? 'Vista previa' : 'Factura emitida'}</Eyebrow>
+          </div>
+          {/* GET normal: la cookie de sesión viaja sola; el backend fija el nombre del archivo. */}
+          <a href={`/api/admin/invoices/${invoice.id}/pdf`} download className={buttonClasses('outline')}>
+            {isDraft ? 'Descargar borrador (PDF)' : 'Descargar PDF'}
+          </a>
+        </div>
         <InvoiceDocument
           fullNumber={invoice.fullNumber}
           kind={invoice.kind}
@@ -96,7 +105,7 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
           totalCents={invoice.totalCents}
           notes={invoice.notes}
           iban={invoice.issuerSnapshot?.iban ?? settings.data?.iban ?? null}
-          footer={isDraft ? (settings.data?.invoiceFooter ?? null) : null}
+          footer={isDraft ? (settings.data?.invoiceFooter ?? null) : (invoice.issuerSnapshot?.invoiceFooter ?? null)}
           rectifies={invoice.rectifies ? { fullNumber: invoice.rectifies.fullNumber, reason: invoice.rectificationReason } : null}
           hash={invoice.hash}
         />

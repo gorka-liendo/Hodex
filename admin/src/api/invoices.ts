@@ -15,6 +15,7 @@ export interface PartySnapshot {
   email: string | null
   phone?: string | null
   iban?: string | null
+  invoiceFooter?: string | null
 }
 
 export interface InvoiceLine {

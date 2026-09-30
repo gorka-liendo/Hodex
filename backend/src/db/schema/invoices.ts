@@ -33,6 +33,8 @@ export interface PartySnapshot {
   email: string | null
   phone?: string | null
   iban?: string | null
+  /** Texto legal del pie vigente al emitir (solo en el emisor). */
+  invoiceFooter?: string | null
 }
 
 /**

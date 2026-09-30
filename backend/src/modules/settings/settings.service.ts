@@ -54,6 +54,7 @@ export function issuerSnapshot(settings: Awaited<ReturnType<typeof getCompanySet
     email: settings.email,
     phone: settings.phone,
     iban: settings.iban,
+    invoiceFooter: settings.invoiceFooter,
   }
 }
 

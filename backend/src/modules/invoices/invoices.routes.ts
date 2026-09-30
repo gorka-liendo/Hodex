@@ -4,6 +4,7 @@ import { parseIdParam } from '../../lib/validation.js'
 import { getAuth } from '../auth/auth.middleware.js'
 import type { Actor } from '../contacts/contacts.service.js'
 import { issueInvoice, verifyInvoiceChain } from './invoices.issue.js'
+import { generateInvoicePdf } from './pdf/invoicePdf.service.js'
 import { invoiceDraftSchema, invoiceListQuerySchema, paymentSchema, rectifySchema } from './invoices.schema.js'
 import {
   createDraft,
@@ -38,6 +39,16 @@ router.post('/', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
   res.json(await getInvoice(parseIdParam(req.params.id)))
+})
+
+router.get('/:id/pdf', async (req, res) => {
+  const { pdf, filename } = await generateInvoicePdf(parseIdParam(req.params.id), actorOf(req, res))
+  res
+    .status(200)
+    .type('application/pdf')
+    .set('Content-Disposition', `attachment; filename="${filename}"`)
+    .set('Content-Length', String(pdf.length))
+    .send(pdf)
 })
 
 // Solo borradores (una emitida responde 409).
