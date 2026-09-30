@@ -7,6 +7,8 @@ import { requireAuth } from '../auth/auth.middleware.js'
 import contactsRoutes from '../contacts/contacts.routes.js'
 import dashboardRoutes from '../dashboard/dashboard.routes.js'
 import expensesRoutes from '../expenses/expenses.routes.js'
+import invoicesRoutes from '../invoices/invoices.routes.js'
+import settingsRoutes from '../settings/settings.routes.js'
 
 /**
  * Router del panel de gestión (/api/admin). Capas, en orden:
@@ -25,5 +27,7 @@ router.use(requireAuth)
 router.use('/contacts', contactsRoutes)
 router.use('/expenses', expensesRoutes)
 router.use('/dashboard', dashboardRoutes)
+router.use('/invoices', invoicesRoutes)
+router.use('/settings', settingsRoutes)
 
 export default router

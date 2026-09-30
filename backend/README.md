@@ -30,6 +30,8 @@ src/
     ├── contacts/         # /api/admin/contacts: clientes y proveedores (NIF validado)
     ├── expenses/         # /api/admin/expenses: gastos (importes en céntimos, baja lógica)
     ├── dashboard/        # /api/admin/dashboard: indicadores del resumen
+    ├── invoices/         # /api/admin/invoices: facturas (numeración, inmutables, huella encadenada)
+    ├── settings/         # /api/admin/settings: datos fiscales de la empresa
     ├── health/           # GET /api/health
     └── contact/          # POST /api/contact  (schema→service→controller→routes)
 ```

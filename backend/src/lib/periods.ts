@@ -33,3 +33,10 @@ export function currentQuarter(now = new Date()): DateRange & { quarter: number;
     to: `${year}-${pad(last)}-${pad(lastDay(year, last))}`,
   }
 }
+
+/** Suma días a una fecha `AAAA-MM-DD` (sin zonas horarias de por medio). */
+export function addDays(isoDate: string, days: number): string {
+  const date = new Date(`${isoDate}T00:00:00Z`)
+  date.setUTCDate(date.getUTCDate() + days)
+  return date.toISOString().slice(0, 10)
+}

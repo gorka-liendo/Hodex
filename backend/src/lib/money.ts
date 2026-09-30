@@ -16,6 +16,16 @@ export function applyRate(cents: number, rateBp: number): number {
   return product < 0 ? -rounded : rounded
 }
 
+/**
+ * Precio unitario × cantidad. La cantidad va en milésimas (1,5 horas = 1500)
+ * para admitir fracciones sin floats; se redondea al céntimo mitad hacia fuera.
+ */
+export function multiplyQuantity(unitCents: number, quantityMilli: number): number {
+  const product = unitCents * quantityMilli
+  const rounded = Math.floor((Math.abs(product) + 500) / 1_000)
+  return product < 0 ? -rounded : rounded
+}
+
 export interface Breakdown {
   baseCents: number
   vatCents: number
