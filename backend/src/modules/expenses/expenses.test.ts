@@ -65,9 +65,25 @@ describe.skipIf(!hasTestDatabase)('gastos', () => {
     expect(res.body).not.toHaveProperty('deletedAt')
   })
 
-  it('ignora importes enviados por el cliente: rechaza campos derivados', async () => {
+  it('rechaza enviar a la vez base y total (importes contradictorios)', async () => {
     const res = await panel.post('/expenses', { ...baseExpense(), totalCents: 1 })
     expect(res.status).toBe(400)
+  })
+
+  it('rechaza un gasto sin importe', async () => {
+    const { baseCents: _base, ...withoutAmount } = baseExpense()
+    expect((await panel.post('/expenses', withoutAmount)).status).toBe(400)
+  })
+
+  it('gasto rápido: se indica lo pagado con IVA incluido y el servidor desglosa', async () => {
+    const { baseCents: _base, ...rest } = baseExpense()
+    const res = await panel.post('/expenses', { ...rest, totalCents: 1_300, description: `Café ${tag}` })
+    expect(res.status).toBe(201)
+    expect(res.body).toMatchObject({ baseCents: 1_074, vatCents: 226, irpfCents: 0, totalCents: 1_300 })
+
+    // Se puede editar también por total.
+    const edited = await panel.put(`/expenses/${res.body.id}`, { ...rest, totalCents: 1_500, vatRateBp: 0 })
+    expect(edited.body).toMatchObject({ baseCents: 1_500, vatCents: 0, totalCents: 1_500 })
   })
 
   it.each([

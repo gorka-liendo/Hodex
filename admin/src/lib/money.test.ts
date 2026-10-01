@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyRate, centsToInput, formatCents, formatRate, parseAmountToCents } from './money'
+import { applyRate, breakdownFromTotal, centsToInput, formatCents, formatRate, parseAmountToCents } from './money'
 
 describe('parseAmountToCents', () => {
   it.each([
@@ -44,5 +44,17 @@ describe('formato', () => {
   it('applyRate coincide con el servidor', () => {
     expect(applyRate(1_999, 2100)).toBe(420)
     expect(applyRate(-5, 1000)).toBe(-1)
+  })
+})
+
+describe('breakdownFromTotal (mismo resultado que el servidor)', () => {
+  it('13 € con 21 % incluido', () => {
+    expect(breakdownFromTotal(1_300, 2100, 0)).toEqual({ baseCents: 1_074, vatCents: 226, irpfCents: 0, totalCents: 1_300 })
+  })
+  it('siempre cuadra al céntimo', () => {
+    for (let total = 1; total <= 50_000; total++) {
+      const b = breakdownFromTotal(total, 2100, 1500)
+      expect(b.baseCents + b.vatCents - b.irpfCents).toBe(total)
+    }
   })
 })

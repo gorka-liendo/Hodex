@@ -33,6 +33,24 @@ export interface Breakdown {
   totalCents: number
 }
 
+/**
+ * Desglose a partir de lo PAGADO (IVA incluido): el caso habitual de un ticket.
+ * Busca la base que, con el redondeo normal, da exactamente ese total. Si por
+ * el redondeo no existe (pasa con algunos importes), toma la más cercana y
+ * ajusta el IVA en 1 céntimo como máximo, como hacen los propios tickets.
+ * Siempre se cumple: base + IVA − IRPF = total.
+ */
+export function breakdownFromTotal(totalCents: number, vatRateBp: number, irpfRateBp: number): Breakdown {
+  const factor = 1 + (vatRateBp - irpfRateBp) / 10_000
+  const estimate = Math.round(totalCents / factor)
+  for (const delta of [0, -1, 1, -2, 2, -3, 3]) {
+    const breakdown = computeBreakdown(estimate + delta, vatRateBp, irpfRateBp)
+    if (breakdown.totalCents === totalCents) return breakdown
+  }
+  const irpfCents = applyRate(estimate, irpfRateBp)
+  return { baseCents: estimate, vatCents: totalCents - estimate + irpfCents, irpfCents, totalCents }
+}
+
 /** Desglose de una factura: IVA sobre la base, retención de IRPF y total a pagar. */
 export function computeBreakdown(baseCents: number, vatRateBp: number, irpfRateBp: number): Breakdown {
   const vatCents = applyRate(baseCents, vatRateBp)

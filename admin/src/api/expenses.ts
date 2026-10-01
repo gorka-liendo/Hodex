@@ -39,14 +39,18 @@ export interface Expense {
   updatedAt: string
 }
 
-/** Lo que envía el formulario: importes derivados (IVA, total…) los calcula la API. */
+/**
+ * Lo que envía el formulario: la base O el total pagado (IVA incluido); el
+ * desglose completo lo calcula la API.
+ */
 export interface ExpenseInput {
   supplierId: string | null
   issueDate: string
   invoiceNumber: string
   description: string
   category: ExpenseCategory
-  baseCents: number
+  baseCents?: number
+  totalCents?: number
   vatRateBp: number
   irpfRateBp: number
   vatDeductible: boolean
