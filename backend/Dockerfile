@@ -25,6 +25,8 @@ ENV PORT=4000
 # Copia solo lo necesario: node_modules de prod + build compilado.
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+# Migraciones SQL: las aplica `npm run db:migrate:prod` en el pre-deploy.
+COPY drizzle ./drizzle
 COPY package.json ./
 
 # Ejecuta como usuario sin privilegios (incluido en la imagen node).

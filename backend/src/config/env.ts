@@ -17,6 +17,38 @@ const envSchema = z.object({
   // Orígenes CORS separados por coma.
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
 
+  // Postgres (opcional hasta que el panel esté desplegado: la landing solo usa
+  // el formulario de contacto, que no necesita base de datos).
+  DATABASE_URL: z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .regex(/^postgres(ql)?:\/\//, 'Debe ser una URL postgres://')
+      .optional(),
+  ),
+
+  // ── Panel de gestión ────────────────────────────────────
+  // Origen exacto del panel: toda petición que modifica datos debe venir de él.
+  ADMIN_ORIGIN: z.string().url().default('http://localhost:5174'),
+  // Secreto compartido con el nginx de admin.hodex.es. Sin él, /api/admin no
+  // es accesible desde el dominio público api.hodex.es. Obligatorio en producción.
+  ADMIN_GATEWAY_SECRET: z.preprocess(
+    emptyToUndefined,
+    z.string().min(32, 'Mínimo 32 caracteres').optional(),
+  ),
+  // Clave AES-256 (32 bytes en base64) para cifrar secretos TOTP en la BD.
+  // Generar con: node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+  AUTH_ENCRYPTION_KEY: z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .refine(
+        (v) => Buffer.from(v, 'base64').length === 32,
+        'Debe ser una clave de 32 bytes en base64',
+      )
+      .optional(),
+  ),
+
   // Email (opcional). Vía preferente: API HTTP de Resend (puerto 443 — los
   // puertos SMTP salientes están bloqueados en muchos PaaS, Railway incluido).
   RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
@@ -46,6 +78,23 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data
+
+/** True si hay base de datos configurada (requisito del panel de gestión). */
+export const isDatabaseConfigured = Boolean(env.DATABASE_URL)
+
+const isProduction = env.NODE_ENV === 'production'
+
+/**
+ * El panel solo se habilita con todas sus piezas de seguridad. Si falta algo,
+ * /api/admin responde 404 (falla cerrado, nunca abierto). En producción además
+ * exige el secreto del gateway y un origen HTTPS.
+ */
+export const isAdminConfigured = Boolean(
+  env.DATABASE_URL &&
+    env.AUTH_ENCRYPTION_KEY &&
+    (!isProduction ||
+      (env.ADMIN_GATEWAY_SECRET && env.ADMIN_ORIGIN.startsWith('https://'))),
+)
 
 /** True solo si hay lo mínimo para enviar email de verdad. */
 export const isEmailConfigured = Boolean(

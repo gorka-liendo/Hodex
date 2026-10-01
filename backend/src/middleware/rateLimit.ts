@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit'
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit'
 import { env } from '../config/env.js'
 
 /**
@@ -13,5 +13,22 @@ export const contactRateLimiter = rateLimit({
   message: {
     error: 'TooManyRequests',
     message: 'Demasiados envíos. Inténtalo de nuevo más tarde.',
+  },
+})
+
+/**
+ * Límite por IP para los pasos de autenticación del panel: 10 intentos cada
+ * 15 min. Complementa el bloqueo por cuenta (que protege aunque el atacante
+ * cambie de IP). Usa la IP real que fija el gateway del panel.
+ */
+export const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: env.NODE_ENV === 'test' ? 1000 : 10,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  keyGenerator: (req, res) => ipKeyGenerator(res.locals.clientIp ?? req.ip ?? 'unknown'),
+  message: {
+    error: 'TooManyRequests',
+    message: 'Demasiados intentos. Espera unos minutos antes de volver a probar.',
   },
 })

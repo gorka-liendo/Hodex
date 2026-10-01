@@ -159,11 +159,29 @@ Su CTA **"Let's talk" va en NEGRO, nunca cobre** (el header es persistente → e
 se reserva para el CTA principal de cada sección, regla "cobre 1× por pantalla").
 Breakpoint: nav + CTA desde `md`; hamburguesa por debajo.
 
+## Panel de gestión (`admin/`)
+
+App aparte (admin.hodex.es) con el mismo sistema. `admin/src/styles/tokens.css`
+es una **copia exacta** de los tokens de `frontend/src/index.css`: se cambian en
+la landing y se copian (`npm run lint` en admin avisa si divergen). Piezas de
+marca reutilizables en `admin/src/components/` (`Button`, `TextField`, `Notice`,
+`PageHeader`, `Eyebrow`, `IndexBox`, `Isotype`). Reglas propias del panel:
+
+- Barra lateral `bg-hodex-black`; contenido sobre `bg-hodex-off-white`.
+- **Cobre solo en la acción principal de la pantalla** (`Button variant="primary"`);
+  cerrar sesión y acciones persistentes en negro u outline.
+- Errores y avisos sin rojos/verdes: `Notice` (hairline lateral + peso).
+- Sin datos reales todavía se muestra `—`, nunca cifras inventadas.
+- Onest autoalojada (`@fontsource-variable/onest`): la CSP no admite terceros.
+
 ## Estructura del repo
 
 - `frontend/` — app Vite/React. `src/index.css` = tokens; `src/components/` =
   componentes; `src/App.tsx` = landing (shell on-brand con hero + secciones
   placeholder, pendiente de contenido real).
+- `admin/` — panel de gestión (ver sección anterior y `admin/README.md`).
+- `backend/` — API Express + Postgres (Drizzle). Login 2FA del panel en
+  `src/modules/auth/`; ver `backend/README.md`.
 - Secciones previstas de la landing: hero (wordmark), proyectos, empresas/partners,
   feedback de clientes, contacto + formulario.
 

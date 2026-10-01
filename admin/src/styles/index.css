@@ -1,0 +1,33 @@
+/* Panel de gestión de Hodex. Mismos tokens que la landing (tokens.css) con dos
+   diferencias deliberadas:
+   - Onest se sirve desde el propio panel (sin Google Fonts): la CSP puede ser
+     `'self'` y el panel no hace ninguna petición a terceros.
+   - Fondo base off-white: el panel es un espacio de trabajo, no una landing. */
+@import 'tailwindcss';
+@import '@fontsource-variable/onest';
+@import './tokens.css';
+
+@theme {
+  --font-body: 'Onest Variable', 'Onest', sans-serif;
+}
+
+@layer base {
+  body {
+    margin: 0;
+    background-color: var(--color-hodex-off-white);
+    color: var(--color-hodex-black);
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Foco visible y on-brand para navegación por teclado (hairline, sin radio). */
+  :focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 3px;
+  }
+}

@@ -11,6 +11,27 @@
 # inyecta automáticamente en las ${...} de abajo.
 
 services:
+  # Postgres SOLO para desarrollo local (en producción lo gestiona Railway).
+  # Publicado únicamente en 127.0.0.1: no es accesible desde la red local.
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hodex
+      POSTGRES_PASSWORD: hodex_dev_only
+      POSTGRES_DB: hodex
+    ports:
+      - "127.0.0.1:5434:5432"
+    volumes:
+      - hodex-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hodex -d hodex"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - hodex
+
   backend:
     build:
       context: ./backend
@@ -21,6 +42,7 @@ services:
       NODE_ENV: production
       PORT: "4000"
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      DATABASE_URL: postgres://hodex:hodex_dev_only@db:5432/hodex
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-}
       SMTP_SECURE: ${SMTP_SECURE:-false}
@@ -28,6 +50,9 @@ services:
       SMTP_PASS: ${SMTP_PASS:-}
       CONTACT_TO: ${CONTACT_TO:-}
       CONTACT_FROM: ${CONTACT_FROM:-}
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       # Publicado para poder depurar la API directamente (opcional).
       - "4000:4000"
@@ -60,3 +85,6 @@ services:
 networks:
   hodex:
     driver: bridge
+
+volumes:
+  hodex-db:
