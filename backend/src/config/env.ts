@@ -60,6 +60,12 @@ const envSchema = z.object({
   ANTHROPIC_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
   ANTHROPIC_MODEL: z.preprocess(emptyToUndefined, z.string().default('claude-haiku-4-5-20251001')),
 
+  // Recepción de facturas por email (Resend Inbound). Sin el secreto del
+  // webhook, la recepción está apagada (el endpoint responde 404).
+  RESEND_WEBHOOK_SECRET: z.preprocess(emptyToUndefined, z.string().startsWith('whsec_').optional()),
+  // Dirección a la que se reenvían las facturas (solo para mostrarla en el panel).
+  INBOUND_ADDRESS: z.preprocess(emptyToUndefined, z.string().email().optional()),
+
   // Email (opcional). Vía preferente: API HTTP de Resend (puerto 443 — los
   // puertos SMTP salientes están bloqueados en muchos PaaS, Railway incluido).
   RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
@@ -114,3 +120,6 @@ export const isEmailConfigured = Boolean(
 
 /** True si se puede leer documentos con Claude. */
 export const isAiConfigured = Boolean(env.ANTHROPIC_API_KEY)
+
+/** True si la recepción de facturas por email está activa. */
+export const isInboundConfigured = Boolean(env.RESEND_WEBHOOK_SECRET)

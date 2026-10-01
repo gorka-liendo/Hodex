@@ -6,7 +6,7 @@ import { aiExtractionRateLimiter, attachmentUploadRateLimiter } from '../../midd
 import { AUTH_POLICY } from '../auth/auth.config.js'
 import { getAuth } from '../auth/auth.middleware.js'
 import type { Actor } from '../contacts/contacts.service.js'
-import { deleteAttachment, extractAttachment, getAttachmentFile, uploadAttachment } from './attachments.service.js'
+import { deleteAttachment, extractAttachment, getAttachmentFile, getAttachmentMeta, uploadAttachment } from './attachments.service.js'
 import { MAX_ATTACHMENT_BYTES } from './fileType.js'
 
 const actorOf = (req: Request, res: Response): Actor => ({
@@ -33,6 +33,11 @@ router.post(
     res.status(201).json(await uploadAttachment(data, req.get('x-filename'), actorOf(req, res)))
   },
 )
+
+/** GET /:id — metadatos del adjunto. */
+router.get('/:id', async (req, res) => {
+  res.json(await getAttachmentMeta(parseIdParam(req.params.id)))
+})
 
 /** GET /:id/file — el archivo, para verlo en el navegador. */
 router.get('/:id/file', async (req, res) => {

@@ -3,6 +3,7 @@ import { check, customType, index, integer, jsonb, pgTable, text, uuid } from 'd
 import { adminUsers } from './auth.js'
 import { timestamptz } from './columns.js'
 import { expenses } from './expenses.js'
+import { inboundEmails } from './inbound.js'
 
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   dataType: () => 'bytea',
@@ -14,13 +15,16 @@ const bytea = customType<{ data: Buffer; driverData: Buffer }>({
  * hay un segundo servicio con credenciales que proteger.
  *
  * Un adjunto nace "suelto" (expense_id NULL) al subirlo y se vincula al guardar
- * el gasto. Los sueltos de más de un día se borran solos.
+ * el gasto. Los sueltos de más de un día se borran solos, salvo los recibidos
+ * por email, que esperan a que el usuario los revise.
  */
 export const attachments = pgTable(
   'attachments',
   {
     id: uuid('id').primaryKey().defaultRandom(),
     expenseId: uuid('expense_id').references(() => expenses.id, { onDelete: 'restrict' }),
+    // Si llegó por email: el correo de origen. Mientras no tenga gasto, está "por revisar".
+    inboundEmailId: uuid('inbound_email_id').references(() => inboundEmails.id, { onDelete: 'set null' }),
     filename: text('filename').notNull(),
     // Tipo comprobado por el contenido real del archivo, no por lo que diga el navegador.
     contentType: text('content_type').notNull(),
@@ -36,5 +40,6 @@ export const attachments = pgTable(
   (t) => [
     check('attachments_size_range', sql`${t.sizeBytes} > 0 AND ${t.sizeBytes} <= 10485760`),
     index('attachments_expense_id_idx').on(t.expenseId),
+    index('attachments_inbound_email_id_idx').on(t.inboundEmailId),
   ],
 )

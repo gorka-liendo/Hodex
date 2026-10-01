@@ -31,7 +31,9 @@ export function createApp(): Application {
   )
 
   // Parseo de JSON con límite razonable + logging de peticiones.
-  app.use(express.json({ limit: '10kb' }))
+  // Los webhooks necesitan el cuerpo en bruto para verificar su firma: allí no se parsea.
+  const json = express.json({ limit: '10kb' })
+  app.use((req, res, next) => (req.path.startsWith('/api/inbound/') ? next() : json(req, res, next)))
   app.use(pinoHttp({ logger }))
 
   // Rutas de la API.
