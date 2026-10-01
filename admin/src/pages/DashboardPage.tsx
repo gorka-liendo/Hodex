@@ -11,10 +11,11 @@ import { formatCents } from '../lib/money'
 const ROADMAP = [
   { phase: '00', name: 'Base segura', detail: 'Acceso con 2FA, sesiones, auditoría', status: 'Lista' },
   { phase: '01', name: 'Gestión', detail: 'Clientes, gastos y resumen', status: 'Lista' },
-  { phase: '02', name: 'Facturación', detail: 'Emisión, PDF, envío por email y WhatsApp', status: 'En curso' },
-  { phase: '03', name: 'Entrada', detail: 'Recepción de facturas por email', status: 'Siguiente' },
-  { phase: '04', name: 'IA', detail: 'Lectura de facturas con Claude', status: 'Pendiente' },
-  { phase: '05', name: 'Verifactu', detail: 'Cumplimiento con la AEAT', status: 'Pendiente' },
+  { phase: '02', name: 'Facturación', detail: 'Emisión, PDF, envío por email y WhatsApp', status: 'Lista' },
+  { phase: '03', name: 'IA', detail: 'Lectura de tickets y facturas con Claude', status: 'Lista' },
+  { phase: '04', name: 'Impuestos', detail: 'Modelos 303 y 130, paquete para la gestoría', status: 'Lista' },
+  { phase: '05', name: 'Entrada', detail: 'Recepción de facturas por email', status: 'Siguiente' },
+  { phase: '06', name: 'Verifactu', detail: 'Cumplimiento con la AEAT (julio de 2027)', status: 'Pendiente' },
 ] as const
 
 /** Indicador: etiqueta, cifra y nota. Si lleva `to`, enlaza al listado filtrado. */
@@ -127,7 +128,7 @@ export function DashboardPage() {
               </div>
               <span
                 className={`text-eyebrow uppercase tracking-eyebrow ${
-                  item.status === 'En curso' || item.status === 'Lista' ? 'text-hodex-black' : 'text-hodex-gray-light'
+                  item.status === 'Lista' ? 'text-hodex-black' : 'text-hodex-gray-light'
                 }`}
               >
                 {item.status}

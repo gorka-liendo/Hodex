@@ -18,6 +18,7 @@ const SECTIONS: Array<{ section: string; items: NavItem[] }> = [
       { to: '/clientes', label: 'Clientes' },
       { to: '/facturas', label: 'Facturas' },
       { to: '/gastos', label: 'Gastos' },
+      { to: '/impuestos', label: 'Impuestos' },
     ],
   },
   {
@@ -25,6 +26,7 @@ const SECTIONS: Array<{ section: string; items: NavItem[] }> = [
     items: [
       { to: '/ajustes/empresa', label: 'Empresa' },
       { to: '/ajustes/seguridad', label: 'Seguridad' },
+      { to: '/ajustes/actividad', label: 'Actividad' },
     ],
   },
 ]
