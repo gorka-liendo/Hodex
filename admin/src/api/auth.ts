@@ -9,6 +9,7 @@ export interface SessionInfo {
     idleTimeoutSeconds: number
   }
   recoveryCodesRemaining: number
+  features: { aiReading: boolean }
 }
 
 /** Segundo factor: código de la app o código de recuperación. */

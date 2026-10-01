@@ -38,5 +38,11 @@ export async function signedInPanel(app: Application) {
       withAuth(request(app).post(`/api/admin${path}`)).send(body),
     put: (path: string, body: object) => withAuth(request(app).put(`/api/admin${path}`)).send(body),
     delete: (path: string) => withAuth(request(app).delete(`/api/admin${path}`)),
+    /** Subida binaria (adjuntos). */
+    upload: (path: string, data: Buffer, filename: string) =>
+      withAuth(request(app).post(`/api/admin${path}`))
+        .set('Content-Type', 'application/octet-stream')
+        .set('X-Filename', encodeURIComponent(filename))
+        .send(data),
   }
 }

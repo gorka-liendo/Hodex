@@ -55,6 +55,11 @@ const envSchema = z.object({
   // Remitente de las facturas. Por defecto, CONTACT_FROM.
   INVOICE_FROM: z.preprocess(emptyToUndefined, z.string().optional()),
 
+  // Lectura de tickets y facturas con Claude (opcional: sin clave, el panel
+  // sigue funcionando y solo desaparece el botón de leer con IA).
+  ANTHROPIC_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
+  ANTHROPIC_MODEL: z.preprocess(emptyToUndefined, z.string().default('claude-sonnet-5-5')),
+
   // Email (opcional). Vía preferente: API HTTP de Resend (puerto 443 — los
   // puertos SMTP salientes están bloqueados en muchos PaaS, Railway incluido).
   RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
@@ -106,3 +111,6 @@ export const isAdminConfigured = Boolean(
 export const isEmailConfigured = Boolean(
   env.CONTACT_TO && (env.RESEND_API_KEY || (env.SMTP_HOST && env.SMTP_PORT)),
 )
+
+/** True si se puede leer documentos con Claude. */
+export const isAiConfigured = Boolean(env.ANTHROPIC_API_KEY)

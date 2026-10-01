@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import type { ExpenseSuggestion } from '../../api/attachments'
 import { ApiError } from '../../api/client'
 import { contactKeys, contactsApi } from '../../api/contacts'
 import { dashboardKeys } from '../../api/dashboard'
@@ -19,7 +20,9 @@ import { QueryStatus } from '../../components/lists'
 import { Notice } from '../../components/Notice'
 import { PageHeader } from '../../components/PageHeader'
 import { breakdownFromTotal, centsToInput, formatCents, parseAmountToCents } from '../../lib/money'
+import { useSession } from '../../auth/useAuth'
 import { todayInSpain } from '../../lib/periods'
+import { ReceiptPanel } from './ReceiptPanel'
 
 /** IVA incluido en lo pagado (lo que pone el ticket), del más habitual al menos. */
 const VAT_INCLUDED_OPTIONS = [
@@ -107,6 +110,8 @@ function ExpenseForm({ expense }: { expense?: Expense }) {
   const [values, setValues] = useState<FormValues>(() => initialValues(expense))
   const [showDetails, setShowDetails] = useState(() => hasDetails(expense))
   const [amountError, setAmountError] = useState<string | null>(null)
+  const [attachmentIds, setAttachmentIds] = useState<string[]>([])
+  const { features } = useSession()
   const isEdit = Boolean(expense)
 
   // Proveedores activos para el desplegable de "Más detalles".
@@ -152,6 +157,25 @@ function ExpenseForm({ expense }: { expense?: Expense }) {
     setValues((prev) => ({ ...prev, [key]: value }))
   }
 
+  /** Vuelca lo leído por la IA en el formulario; lo que no se leyó se queda como está. */
+  function applySuggestion(s: ExpenseSuggestion) {
+    setValues((prev) => ({
+      ...prev,
+      amount: s.totalCents !== null ? centsToInput(s.totalCents) : prev.amount,
+      vatRateBp: s.vatRateBp !== null ? String(s.vatRateBp) : prev.vatRateBp,
+      irpfRateBp: s.irpfRateBp !== null ? String(s.irpfRateBp) : prev.irpfRateBp,
+      description: s.description ?? prev.description,
+      category: s.category ?? prev.category,
+      issueDate: s.issueDate ?? prev.issueDate,
+      // Un ticket se paga el día que se emite.
+      paidOn: !isEdit && s.issueDate ? s.issueDate : prev.paidOn,
+      invoiceNumber: s.invoiceNumber ?? prev.invoiceNumber,
+      supplierId: s.supplierId ?? prev.supplierId,
+    }))
+    setAmountError(null)
+    if (s.supplierId || s.invoiceNumber || (s.irpfRateBp ?? 0) > 0) setShowDetails(true)
+  }
+
   // Desglose en vivo (el que cuenta lo calcula el servidor con la misma regla).
   const totalCents = parseAmountToCents(values.amount)
   const preview =
@@ -178,6 +202,7 @@ function ExpenseForm({ expense }: { expense?: Expense }) {
       vatDeductible: values.vatDeductible,
       paidOn: values.paid ? values.paidOn : null,
       notes: values.notes,
+      attachmentIds,
     })
   }
 
@@ -186,12 +211,25 @@ function ExpenseForm({ expense }: { expense?: Expense }) {
       <PageHeader
         eyebrow={isEdit ? 'Editar gasto' : 'Nuevo gasto'}
         title={isEdit ? expense!.description : 'Nuevo gasto'}
-        description={isEdit ? undefined : 'Lo que has pagado y en qué. El IVA se calcula solo.'}
+        description={
+          isEdit
+            ? undefined
+            : features.aiReading
+              ? 'Sube el ticket y se rellena solo, o escribe lo que has pagado. El IVA se calcula solo.'
+              : 'Lo que has pagado y en qué. El IVA se calcula solo.'
+        }
       />
 
       {apiError && (
         <Notice>{apiError.issues.length > 0 ? 'Revisa los campos marcados antes de guardar.' : apiError.message}</Notice>
       )}
+
+      <ReceiptPanel
+        aiEnabled={features.aiReading}
+        autoApply={!isEdit}
+        onChange={setAttachmentIds}
+        onSuggestion={applySuggestion}
+      />
 
       {/* ─── Lo esencial ─── */}
       <section className="flex flex-col gap-8">

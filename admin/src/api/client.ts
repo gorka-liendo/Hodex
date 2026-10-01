@@ -61,7 +61,13 @@ function isFieldIssueList(value: unknown): value is FieldIssue[] {
   return Array.isArray(value) && value.every((i) => i && Array.isArray(i.path) && typeof i.message === 'string')
 }
 
-async function request<T>(method: Method, url: string, body?: unknown): Promise<T> {
+/** Cuerpo binario (subida de archivos) en lugar de JSON. */
+interface RawBody {
+  data: Blob
+  headers: Record<string, string>
+}
+
+async function request<T>(method: Method, url: string, body?: unknown, raw?: RawBody): Promise<T> {
   let response: Response
   try {
     response = await fetch(url, {
@@ -70,9 +76,9 @@ async function request<T>(method: Method, url: string, body?: unknown): Promise<
       cache: 'no-store',
       headers: {
         'X-Hodex-Request': '1',
-        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+        ...(raw ? raw.headers : body === undefined ? {} : { 'Content-Type': 'application/json' }),
       },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: raw ? raw.data : body === undefined ? undefined : JSON.stringify(body),
     })
   } catch {
     throw new ApiError(0, 'NetworkError', 'No se pudo conectar. Revisa tu conexión.')
@@ -161,6 +167,12 @@ export const api = {
   post: <T>(path: string, body: unknown = {}) => request<T>('POST', buildUrl(path), body),
   put: <T>(path: string, body: unknown) => request<T>('PUT', buildUrl(path), body),
   delete: <T>(path: string) => request<T>('DELETE', buildUrl(path)),
+  /** Sube un archivo tal cual (sin multipart); el nombre viaja en X-Filename. */
+  upload: <T>(path: string, file: File) =>
+    request<T>('POST', buildUrl(path), undefined, {
+      data: file,
+      headers: { 'Content-Type': 'application/octet-stream', 'X-Filename': encodeURIComponent(file.name) },
+    }),
 }
 
 /** Respuesta paginada estándar de la API. */

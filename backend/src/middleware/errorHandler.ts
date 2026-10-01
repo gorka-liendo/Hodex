@@ -31,9 +31,26 @@ export function errorHandler(
     return
   }
 
+  // Errores del parser del cuerpo (JSON mal formado, demasiado grande…).
+  if (isBodyParserError(err)) {
+    const tooLarge = err.status === 413
+    res.status(err.status).json({
+      error: tooLarge ? 'PayloadTooLarge' : 'BadRequest',
+      message: tooLarge ? 'El contenido enviado es demasiado grande.' : 'La petición no es válida.',
+    })
+    return
+  }
+
   // Cualquier otra cosa → 500 sin filtrar detalles internos.
   logger.error({ err }, 'Error no controlado')
   res
     .status(500)
     .json({ error: 'InternalServerError', message: 'Algo salió mal.' })
+}
+
+/** Errores 4xx de body-parser (llevan `type` y `status`, y son seguros de exponer). */
+function isBodyParserError(err: unknown): err is { status: number; type: string } {
+  if (typeof err !== 'object' || err === null) return false
+  const { status, type, expose } = err as { status?: unknown; type?: unknown; expose?: unknown }
+  return typeof type === 'string' && typeof status === 'number' && status >= 400 && status < 500 && expose === true
 }
