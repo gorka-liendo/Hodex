@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { PublicOnly, RequireAuth } from './auth/guards'
 import { AppShell } from './layout/AppShell'
+import { ActivityPage } from './pages/ActivityPage'
 import { ContactDetailPage } from './pages/contacts/ContactDetailPage'
 import { ContactFormPage } from './pages/contacts/ContactFormPage'
 import { ContactsPage } from './pages/contacts/ContactsPage'
@@ -16,6 +17,7 @@ import { NotFoundPage } from './pages/NotFoundPage'
 import { RouteErrorPage } from './pages/RouteErrorPage'
 import { SecurityPage } from './pages/SecurityPage'
 import { CompanySettingsPage } from './pages/settings/CompanySettingsPage'
+import { TaxesPage } from './pages/TaxesPage'
 
 export const router = createBrowserRouter([
   {
@@ -49,8 +51,10 @@ export const router = createBrowserRouter([
       { path: 'gastos/nuevo', element: <ExpenseFormPage /> },
       { path: 'gastos/:id', element: <ExpenseDetailPage /> },
       { path: 'gastos/:id/editar', element: <ExpenseFormPage /> },
+      { path: 'impuestos', element: <TaxesPage /> },
       { path: 'ajustes/empresa', element: <CompanySettingsPage /> },
       { path: 'ajustes/seguridad', element: <SecurityPage /> },
+      { path: 'ajustes/actividad', element: <ActivityPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

@@ -15,7 +15,18 @@ const longDate = new Intl.DateTimeFormat('es-ES', {
   timeZone: TIME_ZONE,
 })
 
+const shortDateTime = new Intl.DateTimeFormat('es-ES', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: TIME_ZONE,
+})
+
 export const formatDateTime = (value: string | Date) => dateTime.format(new Date(value))
+/** "1 oct 2026, 15:32": para listados densos. */
+export const formatShortDateTime = (value: string | Date) => shortDateTime.format(new Date(value))
 export const formatLongDate = (value: string | Date) => longDate.format(new Date(value))
 
 /** Hora actual (0-23) en Madrid. */
