@@ -51,3 +51,21 @@ export const publicLinkRateLimiter = rateLimit({
   legacyHeaders: false,
   message: 'Demasiadas peticiones. Inténtalo más tarde.',
 })
+
+/** Subida de adjuntos: 60 por hora. */
+export const attachmentUploadRateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: env.NODE_ENV === 'test' ? 1000 : 60,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'TooManyRequests', message: 'Demasiadas subidas. Espera un poco.' },
+})
+
+/** Lecturas con IA: 30 por hora. Cada una cuesta dinero; esto acota un bucle o un abuso. */
+export const aiExtractionRateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: env.NODE_ENV === 'test' ? 1000 : 30,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: { error: 'TooManyRequests', message: 'Has leído muchos documentos seguidos. Espera un poco.' },
+})

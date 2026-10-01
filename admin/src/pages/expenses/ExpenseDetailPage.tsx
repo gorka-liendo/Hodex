@@ -12,6 +12,7 @@ import { ReauthPrompt } from '../../components/ReauthPrompt'
 import { formatDateTime } from '../../lib/format'
 import { formatCents, formatRate } from '../../lib/money'
 import { formatShortDate } from '../../lib/periods'
+import { ExpenseAttachments } from './ExpenseAttachments'
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -112,6 +113,8 @@ function ExpenseDetail({ expense }: { expense: Expense }) {
           <Row label="Notas">{expense.notes && <span className="whitespace-pre-line">{expense.notes}</span>}</Row>
         </dl>
       </section>
+
+      <ExpenseAttachments expense={expense} />
 
       <section className="flex flex-col gap-6">
         <Eyebrow>Eliminar</Eyebrow>

@@ -35,6 +35,8 @@ export const expenseInputSchema = z
     vatDeductible: z.boolean().default(true),
     paidOn: isoDate.nullish().transform((v) => v ?? null),
     notes: optionalText(2000),
+    // Adjuntos ya subidos que se vinculan a este gasto (los existentes se conservan).
+    attachmentIds: z.array(z.string().uuid('Archivo no válido')).max(5, 'Máximo 5 archivos').default([]),
   })
   .strict()
   .superRefine((value, ctx) => {
@@ -59,3 +61,7 @@ export const expenseListQuerySchema = paginationSchema.extend({
 })
 
 export type ExpenseListQuery = z.infer<typeof expenseListQuerySchema>
+
+export const attachSchema = z
+  .object({ attachmentIds: z.array(z.string().uuid('Archivo no válido')).min(1).max(5, 'Máximo 5 archivos') })
+  .strict()

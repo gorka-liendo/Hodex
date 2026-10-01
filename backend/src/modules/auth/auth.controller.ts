@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import { isAiConfigured } from '../../config/env.js'
 import { getRequestContext } from '../../lib/requestContext.js'
 import { recordAudit } from '../../services/audit.js'
 import { AUTH_POLICY, CHALLENGE_COOKIE, COOKIE_OPTIONS, SESSION_COOKIE } from './auth.config.js'
@@ -47,6 +48,8 @@ export async function getSession(_req: Request, res: Response): Promise<void> {
       idleTimeoutSeconds: AUTH_POLICY.sessionIdleMs / 1000,
     },
     recoveryCodesRemaining: await countRemainingRecoveryCodes(auth.userId),
+    // Funciones opcionales disponibles en este despliegue.
+    features: { aiReading: isAiConfigured },
   })
 }
 

@@ -50,6 +50,13 @@
       "when": 1790855426993,
       "tag": "0006_invoice_sharing",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790858475303,
+      "tag": "0007_expense_attachments",
+      "breakpoints": true
     }
   ]
 }

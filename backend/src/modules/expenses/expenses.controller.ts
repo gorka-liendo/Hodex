@@ -3,8 +3,9 @@ import { getRequestContext } from '../../lib/requestContext.js'
 import { parseIdParam } from '../../lib/validation.js'
 import { getAuth } from '../auth/auth.middleware.js'
 import type { Actor } from '../contacts/contacts.service.js'
-import { expenseInputSchema, expenseListQuerySchema } from './expenses.schema.js'
+import { attachSchema, expenseInputSchema, expenseListQuerySchema } from './expenses.schema.js'
 import {
+  attachToExpense,
   createExpense,
   deleteExpense,
   getExpense,
@@ -42,4 +43,10 @@ export async function update(req: Request, res: Response): Promise<void> {
 export async function remove(req: Request, res: Response): Promise<void> {
   await deleteExpense(parseIdParam(req.params.id), actorOf(req, res))
   res.status(204).end()
+}
+
+/** POST /api/admin/expenses/:id/attachments — vincula justificantes ya subidos. */
+export async function attach(req: Request, res: Response): Promise<void> {
+  const { attachmentIds } = attachSchema.parse(req.body)
+  res.json(await attachToExpense(parseIdParam(req.params.id), attachmentIds, actorOf(req, res)))
 }

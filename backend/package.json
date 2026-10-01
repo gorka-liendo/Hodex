@@ -20,6 +20,7 @@
     "admin:create:prod": "node dist/scripts/create-admin.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@fontsource/onest": "^5.3.1",
     "argon2": "^0.45.1",
     "cookie": "^2.0.1",

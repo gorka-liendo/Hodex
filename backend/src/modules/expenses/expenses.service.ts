@@ -5,6 +5,7 @@ import { AppError } from '../../lib/AppError.js'
 import { breakdownFromTotal, computeBreakdown } from '../../lib/money.js'
 import { likePattern } from '../../lib/validation.js'
 import { recordAudit } from '../../services/audit.js'
+import { linkAttachments, listExpenseAttachments } from '../attachments/attachments.service.js'
 import type { Actor } from '../contacts/contacts.service.js'
 import type { ExpenseInput, ExpenseListQuery } from './expenses.schema.js'
 
@@ -49,7 +50,7 @@ async function assertSupplier(supplierId: string | null, previous?: string | nul
  * (IVA incluido). El cliente nunca fija IVA, retención ni total directamente.
  */
 function withAmounts(input: ExpenseInput) {
-  const { baseCents, totalCents, ...rest } = input
+  const { baseCents, totalCents, attachmentIds: _attachmentIds, ...rest } = input
   const amounts =
     totalCents !== undefined
       ? breakdownFromTotal(totalCents, input.vatRateBp, input.irpfRateBp)
@@ -105,7 +106,7 @@ export async function listExpenses(query: ExpenseListQuery) {
   return { items: rows.map(present), total: count, page: query.page, pageSize: query.pageSize, sums }
 }
 
-export async function getExpense(id: string): Promise<ExpenseView> {
+export async function getExpense(id: string) {
   const [row] = await getDb()
     .select(expenseWithSupplier)
     .from(expenses)
@@ -113,13 +114,14 @@ export async function getExpense(id: string): Promise<ExpenseView> {
     .where(and(eq(expenses.id, id), isNull(expenses.deletedAt)))
     .limit(1)
   if (!row) throw notFound()
-  return present(row)
+  return { ...present(row), attachments: await listExpenseAttachments(id) }
 }
 
-export async function createExpense(input: ExpenseInput, actor: Actor): Promise<ExpenseView> {
+export async function createExpense(input: ExpenseInput, actor: Actor) {
   await assertSupplier(input.supplierId)
   const id = await getDb().transaction(async (tx) => {
     const [expense] = await tx.insert(expenses).values(withAmounts(input)).returning({ id: expenses.id })
+    await linkAttachments(tx, expense!.id, input.attachmentIds)
     await recordAudit(
       { action: 'expense.create', outcome: 'success', userId: actor.userId, context: actor.context, metadata: { expenseId: expense!.id } },
       tx,
@@ -129,7 +131,7 @@ export async function createExpense(input: ExpenseInput, actor: Actor): Promise<
   return getExpense(id)
 }
 
-export async function updateExpense(id: string, input: ExpenseInput, actor: Actor): Promise<ExpenseView> {
+export async function updateExpense(id: string, input: ExpenseInput, actor: Actor) {
   const before = await getExpense(id)
   await assertSupplier(input.supplierId, before.supplierId)
   const values = withAmounts(input)
@@ -139,6 +141,7 @@ export async function updateExpense(id: string, input: ExpenseInput, actor: Acto
 
   await getDb().transaction(async (tx) => {
     await tx.update(expenses).set(values).where(eq(expenses.id, id))
+    await linkAttachments(tx, id, input.attachmentIds)
     await recordAudit(
       { action: 'expense.update', outcome: 'success', userId: actor.userId, context: actor.context, metadata: { expenseId: id, changed } },
       tx,
@@ -157,4 +160,17 @@ export async function deleteExpense(id: string, actor: Actor): Promise<void> {
       tx,
     )
   })
+}
+
+/** Añade justificantes ya subidos a un gasto existente. */
+export async function attachToExpense(id: string, attachmentIds: string[], actor: Actor) {
+  await getExpense(id)
+  await getDb().transaction(async (tx) => {
+    await linkAttachments(tx, id, attachmentIds)
+    await recordAudit(
+      { action: 'expense.attach', outcome: 'success', userId: actor.userId, context: actor.context, metadata: { expenseId: id, attachmentIds } },
+      tx,
+    )
+  })
+  return getExpense(id)
 }

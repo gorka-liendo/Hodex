@@ -20,6 +20,8 @@ export const EXPENSE_CATEGORIES = [
   'other',
 ] as const
 
+export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number]
+
 export const expenseCategory = pgEnum('expense_category', EXPENSE_CATEGORIES)
 
 /**

@@ -1,3 +1,4 @@
+import type { Attachment } from './attachments'
 import { api, type Page } from './client'
 
 export const EXPENSE_CATEGORIES = {
@@ -37,6 +38,8 @@ export interface Expense {
   notes: string | null
   createdAt: string
   updatedAt: string
+  /** Solo en el detalle (GET /expenses/:id). */
+  attachments?: Attachment[]
 }
 
 /**
@@ -56,6 +59,8 @@ export interface ExpenseInput {
   vatDeductible: boolean
   paidOn: string | null
   notes: string
+  /** Adjuntos nuevos a vincular (los ya vinculados se conservan). */
+  attachmentIds?: string[]
 }
 
 export interface ExpenseFilters {
@@ -82,6 +87,7 @@ export const expensesApi = {
   create: (input: ExpenseInput) => api.post<Expense>('/expenses', input),
   update: (id: string, input: ExpenseInput) => api.put<Expense>(`/expenses/${id}`, input),
   remove: (id: string) => api.delete<void>(`/expenses/${id}`),
+  attach: (id: string, attachmentIds: string[]) => api.post<Expense>(`/expenses/${id}/attachments`, { attachmentIds }),
 }
 
 export const expenseKeys = {
