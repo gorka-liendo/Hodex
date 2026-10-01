@@ -58,7 +58,7 @@ const envSchema = z.object({
   // Lectura de tickets y facturas con Claude (opcional: sin clave, el panel
   // sigue funcionando y solo desaparece el botón de leer con IA).
   ANTHROPIC_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
-  ANTHROPIC_MODEL: z.preprocess(emptyToUndefined, z.string().default('claude-sonnet-5-5')),
+  ANTHROPIC_MODEL: z.preprocess(emptyToUndefined, z.string().default('claude-haiku-4-5-20251001')),
 
   // Email (opcional). Vía preferente: API HTTP de Resend (puerto 443 — los
   // puertos SMTP salientes están bloqueados en muchos PaaS, Railway incluido).
