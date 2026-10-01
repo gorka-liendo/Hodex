@@ -15,7 +15,6 @@ const ROADMAP = [
   { phase: '03', name: 'IA', detail: 'Lectura de tickets y facturas con Claude', status: 'Lista' },
   { phase: '04', name: 'Impuestos', detail: 'Modelos 303 y 130, paquete para la gestoría', status: 'Lista' },
   { phase: '05', name: 'Entrada', detail: 'Recepción de facturas por email', status: 'Siguiente' },
-  { phase: '06', name: 'Verifactu', detail: 'Cumplimiento con la AEAT (julio de 2027)', status: 'Pendiente' },
 ] as const
 
 /** Indicador: etiqueta, cifra y nota. Si lleva `to`, enlaza al listado filtrado. */
