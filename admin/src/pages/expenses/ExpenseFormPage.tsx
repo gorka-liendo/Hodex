@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import type { ExpenseSuggestion } from '../../api/attachments'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { attachmentsApi, type Attachment, type ExpenseSuggestion } from '../../api/attachments'
 import { ApiError } from '../../api/client'
 import { contactKeys, contactsApi } from '../../api/contacts'
 import { dashboardKeys } from '../../api/dashboard'
+import { inboxKeys } from '../../api/inbox'
 import {
   EXPENSE_CATEGORIES,
   expenseKeys,
@@ -99,18 +100,29 @@ export function ExpenseFormPage() {
     enabled: Boolean(id),
   })
 
+  // Gasto nuevo a partir de un justificante recibido por email (?adjunto=<id>).
+  const [search] = useSearchParams()
+  const attachmentId = id ? null : search.get('adjunto')
+  const initial = useQuery({
+    queryKey: ['attachments', attachmentId],
+    queryFn: () => attachmentsApi.get(attachmentId!),
+    enabled: Boolean(attachmentId),
+  })
+
   if (id && existing.isPending) return <QueryStatus />
   if (id && existing.isError) return <QueryStatus error={existing.error} />
-  return <ExpenseForm key={id ?? 'new'} expense={existing.data} />
+  if (attachmentId && initial.isPending) return <QueryStatus />
+  if (attachmentId && initial.isError) return <QueryStatus error={initial.error} />
+  return <ExpenseForm key={id ?? attachmentId ?? 'new'} expense={existing.data} initialAttachment={initial.data} />
 }
 
-function ExpenseForm({ expense }: { expense?: Expense }) {
+function ExpenseForm({ expense, initialAttachment }: { expense?: Expense; initialAttachment?: Attachment }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [values, setValues] = useState<FormValues>(() => initialValues(expense))
   const [showDetails, setShowDetails] = useState(() => hasDetails(expense))
   const [amountError, setAmountError] = useState<string | null>(null)
-  const [attachmentIds, setAttachmentIds] = useState<string[]>([])
+  const [attachmentIds, setAttachmentIds] = useState<string[]>(() => (initialAttachment ? [initialAttachment.id] : []))
   const { features } = useSession()
   const isEdit = Boolean(expense)
 
@@ -134,6 +146,7 @@ function ExpenseForm({ expense }: { expense?: Expense }) {
       queryClient.setQueryData(expenseKeys.detail(saved.id), saved)
       void queryClient.invalidateQueries({ queryKey: expenseKeys.all })
       void queryClient.invalidateQueries({ queryKey: dashboardKeys.all })
+      void queryClient.invalidateQueries({ queryKey: inboxKeys.all })
       navigate(`/gastos/${saved.id}`, { replace: isEdit })
     },
   })
@@ -225,6 +238,7 @@ function ExpenseForm({ expense }: { expense?: Expense }) {
       )}
 
       <ReceiptPanel
+        initial={initialAttachment}
         aiEnabled={features.aiReading}
         autoApply={!isEdit}
         onChange={setAttachmentIds}

@@ -11,6 +11,7 @@ import { LinkButton } from '../../components/Button'
 import { SelectField, TextField } from '../../components/fields'
 import { EmptyState, FilterTabs, Pagination, QueryStatus } from '../../components/lists'
 import { PageHeader } from '../../components/PageHeader'
+import { InboxBanner } from './InboxPage'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { formatCents } from '../../lib/money'
 import { formatShortDate, PERIOD_OPTIONS, periodRange, type PeriodKey } from '../../lib/periods'
@@ -74,11 +75,18 @@ export function ExpensesPage() {
         title="Gastos"
         description="Facturas recibidas y gastos de la empresa, con su IVA soportado."
         actions={
-          <LinkButton to="/gastos/nuevo" variant="primary">
-            Nuevo gasto
-          </LinkButton>
+          <div className="flex flex-wrap gap-4">
+            <LinkButton to="/gastos/recibidas" variant="outline">
+              Recibidas por email
+            </LinkButton>
+            <LinkButton to="/gastos/nuevo" variant="primary">
+              Nuevo gasto
+            </LinkButton>
+          </div>
         }
       />
+
+      <InboxBanner />
 
       <div className="flex flex-col gap-6">
         <FilterTabs

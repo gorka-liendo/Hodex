@@ -3,6 +3,7 @@ import healthRoutes from '../modules/health/health.routes.js'
 import contactRoutes from '../modules/contact/contact.routes.js'
 import adminRoutes from '../modules/admin/admin.routes.js'
 import publicLinkRoutes from '../modules/invoices/sharing/publicLink.routes.js'
+import inboundWebhookRoutes from '../modules/inbound/webhook.routes.js'
 
 /** Router raíz de la API. Monta aquí cada módulo nuevo. */
 const router = Router()
@@ -13,5 +14,7 @@ router.use('/contact', contactRoutes)
 router.use('/admin', adminRoutes)
 // Enlaces públicos de factura (WhatsApp): sin sesión, token de un solo propósito.
 router.use('/f', publicLinkRoutes)
+// Webhook de correo entrante (Resend): firmado, sin sesión.
+router.use('/inbound', inboundWebhookRoutes)
 
 export default router

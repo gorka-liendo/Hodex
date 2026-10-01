@@ -8,6 +8,7 @@ import { logger } from '../../lib/logger.js'
 import { todayInSpain } from '../../lib/periods.js'
 import { normalizeTaxId } from '../../lib/taxId.js'
 import { recordAudit } from '../../services/audit.js'
+import type { RequestContext } from '../../lib/requestContext.js'
 import type { Actor } from '../contacts/contacts.service.js'
 import { getCompanySettings } from '../settings/settings.service.js'
 import { rawExtractionSchema, readDocumentWithClaude } from './claudeReader.js'
@@ -23,6 +24,7 @@ const notFound = () => new AppError(404, 'Archivo no encontrado.', { code: 'NotF
 const metadata = {
   id: attachments.id,
   expenseId: attachments.expenseId,
+  inboundEmailId: attachments.inboundEmailId,
   filename: attachments.filename,
   contentType: attachments.contentType,
   sizeBytes: attachments.sizeBytes,
@@ -31,7 +33,22 @@ const metadata = {
 
 export type AttachmentMeta = { [K in keyof typeof metadata]: (typeof attachments.$inferSelect)[K] }
 
-export async function uploadAttachment(data: Buffer, rawFilename: string | undefined, actor: Actor): Promise<AttachmentMeta> {
+/** Quién actúa: el usuario del panel, o el sistema (userId null) al procesar un correo. */
+export interface ActingParty {
+  userId: string | null
+  context?: RequestContext
+}
+
+/**
+ * Valida y guarda un archivo. Lo usan la subida del panel y la recepción por
+ * email: las mismas reglas (tamaño, tipo real, nombre seguro) para ambas.
+ */
+export async function storeAttachment(
+  data: Buffer,
+  rawFilename: string | undefined,
+  actor: ActingParty,
+  options: { inboundEmailId?: string } = {},
+): Promise<AttachmentMeta> {
   if (data.length === 0) throw new AppError(400, 'El archivo está vacío.', { code: 'EmptyFile' })
   if (data.length > MAX_ATTACHMENT_BYTES) {
     throw new AppError(413, 'El archivo supera los 10 MB.', { code: 'FileTooLarge' })
@@ -42,10 +59,16 @@ export async function uploadAttachment(data: Buffer, rawFilename: string | undef
   }
 
   const db = getDb()
-  // Limpieza oportunista de adjuntos abandonados.
+  // Limpieza oportunista de subidas abandonadas (lo recibido por email espera a ser revisado).
   await db
     .delete(attachments)
-    .where(and(isNull(attachments.expenseId), lt(attachments.createdAt, new Date(Date.now() - ORPHAN_TTL_MS))))
+    .where(
+      and(
+        isNull(attachments.expenseId),
+        isNull(attachments.inboundEmailId),
+        lt(attachments.createdAt, new Date(Date.now() - ORPHAN_TTL_MS)),
+      ),
+    )
 
   const [row] = await db
     .insert(attachments)
@@ -56,6 +79,7 @@ export async function uploadAttachment(data: Buffer, rawFilename: string | undef
       sha256: createHash('sha256').update(data).digest('hex'),
       data,
       uploadedBy: actor.userId,
+      inboundEmailId: options.inboundEmailId ?? null,
     })
     .returning(metadata)
   await recordAudit({
@@ -63,9 +87,20 @@ export async function uploadAttachment(data: Buffer, rawFilename: string | undef
     outcome: 'success',
     userId: actor.userId,
     context: actor.context,
-    metadata: { attachmentId: row!.id, contentType: type, sizeBytes: data.length },
+    metadata: { attachmentId: row!.id, contentType: type, sizeBytes: data.length, ...(options.inboundEmailId ? { inboundEmailId: options.inboundEmailId } : {}) },
   })
   return row!
+}
+
+export function uploadAttachment(data: Buffer, rawFilename: string | undefined, actor: Actor): Promise<AttachmentMeta> {
+  return storeAttachment(data, rawFilename, actor)
+}
+
+/** Metadatos de un adjunto (para abrir uno recibido por email en el formulario). */
+export async function getAttachmentMeta(id: string): Promise<AttachmentMeta> {
+  const [row] = await getDb().select(metadata).from(attachments).where(eq(attachments.id, id)).limit(1)
+  if (!row) throw notFound()
+  return row
 }
 
 export async function getAttachmentFile(id: string) {
@@ -151,7 +186,7 @@ async function findSupplierByTaxId(taxId: string | null) {
  * Lee un adjunto con Claude y devuelve una propuesta para el formulario. La
  * lectura se guarda: repetirla sobre el mismo archivo no vuelve a costar.
  */
-export async function extractAttachment(id: string, actor: Actor, options: { force?: boolean } = {}) {
+export async function extractAttachment(id: string, actor: ActingParty, options: { force?: boolean } = {}) {
   if (!isAiConfigured) {
     throw new AppError(503, 'La lectura con IA no está configurada.', { code: 'AiNotConfigured' })
   }

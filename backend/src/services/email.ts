@@ -55,7 +55,7 @@ export interface EmailResult {
  * en Resend la contraseña SMTP ES la API key, así que si el host es
  * smtp.resend.com podemos reutilizarla para la vía HTTP.
  */
-function getResendKey(): string | undefined {
+export function getResendKey(): string | undefined {
   if (env.RESEND_API_KEY) return env.RESEND_API_KEY
   if (env.SMTP_HOST === 'smtp.resend.com') return env.SMTP_PASS
   return undefined

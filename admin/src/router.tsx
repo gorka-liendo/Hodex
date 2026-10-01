@@ -9,6 +9,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { ExpenseDetailPage } from './pages/expenses/ExpenseDetailPage'
 import { ExpenseFormPage } from './pages/expenses/ExpenseFormPage'
 import { ExpensesPage } from './pages/expenses/ExpensesPage'
+import { InboxPage } from './pages/expenses/InboxPage'
 import { LoginPage } from './pages/LoginPage'
 import { InvoiceDetailPage } from './pages/invoices/InvoiceDetailPage'
 import { InvoiceEditorPage } from './pages/invoices/InvoiceEditorPage'
@@ -49,6 +50,7 @@ export const router = createBrowserRouter([
       { path: 'facturas/:id/editar', element: <InvoiceEditorPage /> },
       { path: 'gastos', element: <ExpensesPage /> },
       { path: 'gastos/nuevo', element: <ExpenseFormPage /> },
+      { path: 'gastos/recibidas', element: <InboxPage /> },
       { path: 'gastos/:id', element: <ExpenseDetailPage /> },
       { path: 'gastos/:id/editar', element: <ExpenseFormPage /> },
       { path: 'impuestos', element: <TaxesPage /> },

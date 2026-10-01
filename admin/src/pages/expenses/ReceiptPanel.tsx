@@ -1,4 +1,4 @@
-import { useRef, useState, type DragEvent } from 'react'
+import { useEffect, useRef, useState, type DragEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { ACCEPTED_FILES, attachmentsApi, formatFileSize, MAX_FILE_BYTES, type Attachment, type ExpenseSuggestion } from '../../api/attachments'
 import { ApiError } from '../../api/client'
@@ -26,11 +26,14 @@ const errorMessage = (error: unknown, fallback: string) => (error instanceof Api
  * solo si el usuario lo pide. Nada se guarda hasta pulsar "Guardar".
  */
 export function ReceiptPanel({
+  initial,
   aiEnabled,
   autoApply,
   onChange,
   onSuggestion,
 }: {
+  /** Justificante ya guardado con el que se abre el formulario (recibido por email). */
+  initial?: Attachment
   aiEnabled: boolean
   /** Rellenar el formulario sin preguntar (gasto nuevo). */
   autoApply: boolean
@@ -39,7 +42,32 @@ export function ReceiptPanel({
   onSuggestion: (suggestion: ExpenseSuggestion) => void
 }) {
   const input = useRef<HTMLInputElement>(null)
-  const [items, setItems] = useState<Item[]>([])
+  const [items, setItems] = useState<Item[]>(() =>
+    initial ? [{ attachment: initial, reading: aiEnabled ? { status: 'reading' } : { status: 'idle' } }] : [],
+  )
+
+  // El justificante recibido ya se leyó al llegar: se recupera esa lectura (sin coste) y se aplica.
+  useEffect(() => {
+    if (!initial || !aiEnabled) return
+    let cancelled = false
+    attachmentsApi
+      .extract(initial.id)
+      .then((suggestion) => {
+        if (cancelled) return
+        setItems((prev) => prev.map((i) => (i.attachment.id === initial.id ? { ...i, reading: { status: 'done', suggestion } } : i)))
+        onSuggestion(suggestion)
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return
+        const message = errorMessage(err, 'No se pudo leer el documento.')
+        setItems((prev) => prev.map((i) => (i.attachment.id === initial.id ? { ...i, reading: { status: 'error', message } } : i)))
+      })
+    return () => {
+      cancelled = true
+    }
+    // Solo al abrir el formulario.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [uploading, setUploading] = useState(false)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -86,10 +114,12 @@ export function ReceiptPanel({
     }
   }
 
-  async function remove(id: string) {
-    update(items.filter((i) => i.attachment.id !== id))
-    // Un adjunto aún sin gasto se borra al momento; si fallara, se limpia solo en 24 h.
-    await attachmentsApi.remove(id).catch(() => undefined)
+  async function remove(attachment: Attachment) {
+    update(items.filter((i) => i.attachment.id !== attachment.id))
+    // Lo recibido por email vuelve a la bandeja; lo subido aquí se borra al momento
+    // (si fallara, se limpia solo en 24 h).
+    if (attachment.inboundEmailId) return
+    await attachmentsApi.remove(attachment.id).catch(() => undefined)
   }
 
   function onDrop(event: DragEvent) {
@@ -160,7 +190,7 @@ export function ReceiptPanel({
                 <a href={attachmentsApi.fileUrl(attachment.id)} target="_blank" rel="noopener" className={linkClass}>
                   Ver
                 </a>
-                <button type="button" className={linkClass} onClick={() => void remove(attachment.id)}>
+                <button type="button" className={linkClass} onClick={() => void remove(attachment)}>
                   Quitar
                 </button>
               </div>

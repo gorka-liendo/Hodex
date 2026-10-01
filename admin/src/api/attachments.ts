@@ -4,6 +4,7 @@ import type { ExpenseCategory } from './expenses'
 export interface Attachment {
   id: string
   expenseId: string | null
+  inboundEmailId: string | null
   filename: string
   contentType: 'application/pdf' | 'image/jpeg' | 'image/png' | 'image/webp'
   sizeBytes: number
@@ -30,6 +31,7 @@ export const MAX_FILE_BYTES = 10 * 1024 * 1024
 
 export const attachmentsApi = {
   upload: (file: File) => api.upload<Attachment>('/attachments', file),
+  get: (id: string) => api.get<Attachment>(`/attachments/${id}`),
   extract: (id: string, force = false) =>
     api.post<ExpenseSuggestion>(`/attachments/${id}/extract${force ? '?force=true' : ''}`),
   remove: (id: string) => api.delete<void>(`/attachments/${id}`),
