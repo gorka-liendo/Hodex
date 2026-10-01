@@ -94,3 +94,22 @@ export function multiplyQuantity(unitCents: number, quantityMilli: number): numb
   const rounded = Math.floor((Math.abs(product) + 500) / 1_000)
   return product < 0 ? -rounded : rounded
 }
+
+/**
+ * Copia de `breakdownFromTotal` del servidor (backend/src/lib/money.ts), para
+ * la vista previa: desglosa lo pagado con IVA incluido. Manda la API.
+ */
+export function breakdownFromTotal(totalCents: number, vatRateBp: number, irpfRateBp: number) {
+  const compute = (base: number) => {
+    const vat = applyRate(base, vatRateBp)
+    const irpf = applyRate(base, irpfRateBp)
+    return { baseCents: base, vatCents: vat, irpfCents: irpf, totalCents: base + vat - irpf }
+  }
+  const estimate = Math.round(totalCents / (1 + (vatRateBp - irpfRateBp) / 10_000))
+  for (const delta of [0, -1, 1, -2, 2, -3, 3]) {
+    const b = compute(estimate + delta)
+    if (b.totalCents === totalCents) return b
+  }
+  const irpfCents = applyRate(estimate, irpfRateBp)
+  return { baseCents: estimate, vatCents: totalCents - estimate + irpfCents, irpfCents, totalCents }
+}

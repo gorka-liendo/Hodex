@@ -9,9 +9,15 @@ const rateBp = z
   .min(0, 'Tipo no válido')
   .max(10_000, 'Tipo no válido')
 
+const amountCents = z
+  .number({ invalid_type_error: 'Importe no válido' })
+  .int('Importe no válido')
+  .refine((v) => v !== 0, 'El importe no puede ser 0')
+  .refine((v) => Math.abs(v) <= MAX_AMOUNT_CENTS, 'Importe demasiado alto')
+
 /**
- * Datos de un gasto. El cliente envía base y tipos; IVA, IRPF y total los
- * calcula el servidor (nunca se aceptan importes derivados del cliente).
+ * Datos de un gasto. El cliente envía la base O el total pagado (IVA incluido)
+ * y los tipos; el desglose completo lo calcula el servidor.
  */
 export const expenseInputSchema = z
   .object({
@@ -20,11 +26,10 @@ export const expenseInputSchema = z
     invoiceNumber: optionalText(60),
     description: z.string().trim().min(1, 'Describe el gasto').max(300, 'Máximo 300 caracteres'),
     category: z.enum(EXPENSE_CATEGORIES, { errorMap: () => ({ message: 'Elige una categoría' }) }),
-    baseCents: z
-      .number({ invalid_type_error: 'Importe no válido' })
-      .int('Importe no válido')
-      .refine((v) => v !== 0, 'El importe no puede ser 0')
-      .refine((v) => Math.abs(v) <= MAX_AMOUNT_CENTS, 'Importe demasiado alto'),
+    // Una de dos: la base imponible (factura de proveedor) o el total pagado
+    // con el IVA incluido (un ticket). El resto lo calcula el servidor.
+    baseCents: amountCents.optional(),
+    totalCents: amountCents.optional(),
     vatRateBp: rateBp,
     irpfRateBp: rateBp.default(0),
     vatDeductible: z.boolean().default(true),
@@ -32,6 +37,15 @@ export const expenseInputSchema = z
     notes: optionalText(2000),
   })
   .strict()
+  .superRefine((value, ctx) => {
+    if ((value.baseCents === undefined) === (value.totalCents === undefined)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [value.totalCents === undefined ? 'totalCents' : 'baseCents'],
+        message: 'Indica el importe',
+      })
+    }
+  })
 
 export type ExpenseInput = z.infer<typeof expenseInputSchema>
 

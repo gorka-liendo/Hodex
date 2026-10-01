@@ -80,12 +80,17 @@ function ExpenseDetail({ expense }: { expense: Expense }) {
         }
       />
 
-      <dl className="grid gap-px border border-hodex-line bg-hodex-line sm:grid-cols-4">
+      {/* La retención solo aparece si la hay (en un ticket normal sobra). */}
+      <dl
+        className={`grid gap-px border border-hodex-line bg-hodex-line ${
+          expense.irpfRateBp > 0 ? 'sm:grid-cols-4' : 'sm:grid-cols-3'
+        }`}
+      >
         {[
           ['Base', expense.baseCents],
-          [`IVA ${formatRate(expense.vatRateBp)}`, expense.vatCents],
-          [`Retención ${formatRate(expense.irpfRateBp)}`, -expense.irpfCents],
-          ['Total', expense.totalCents],
+          [expense.vatRateBp > 0 ? `IVA ${formatRate(expense.vatRateBp)}` : 'Sin IVA', expense.vatCents],
+          ...(expense.irpfRateBp > 0 ? [[`Retención ${formatRate(expense.irpfRateBp)}`, -expense.irpfCents]] : []),
+          ['Total pagado', expense.totalCents],
         ].map(([label, cents]) => (
           <div key={label as string} className="flex flex-col gap-2 bg-hodex-white p-6">
             <dt className="text-eyebrow uppercase tracking-eyebrow text-hodex-gray">{label}</dt>

@@ -2,7 +2,7 @@ import { and, desc, eq, gte, ilike, isNotNull, isNull, lte, or, sql, type SQL } 
 import { getDb } from '../../db/client.js'
 import { contacts, expenses } from '../../db/schema/index.js'
 import { AppError } from '../../lib/AppError.js'
-import { computeBreakdown } from '../../lib/money.js'
+import { breakdownFromTotal, computeBreakdown } from '../../lib/money.js'
 import { likePattern } from '../../lib/validation.js'
 import { recordAudit } from '../../services/audit.js'
 import type { Actor } from '../contacts/contacts.service.js'
@@ -44,9 +44,17 @@ async function assertSupplier(supplierId: string | null, previous?: string | nul
   }
 }
 
-/** Importes calculados en el servidor a partir de la base y los tipos. */
+/**
+ * Importes calculados en el servidor, a partir de la base o del total pagado
+ * (IVA incluido). El cliente nunca fija IVA, retención ni total directamente.
+ */
 function withAmounts(input: ExpenseInput) {
-  return { ...input, ...computeBreakdown(input.baseCents, input.vatRateBp, input.irpfRateBp) }
+  const { baseCents, totalCents, ...rest } = input
+  const amounts =
+    totalCents !== undefined
+      ? breakdownFromTotal(totalCents, input.vatRateBp, input.irpfRateBp)
+      : computeBreakdown(baseCents!, input.vatRateBp, input.irpfRateBp)
+  return { ...rest, ...amounts }
 }
 
 export async function listExpenses(query: ExpenseListQuery) {
