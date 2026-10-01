@@ -23,4 +23,7 @@ export const authApi = {
   logout: () => api.post<void>('/auth/logout'),
   reauth: (factor: SecondFactor) => api.post<void>('/auth/reauth', factor),
   logoutOthers: () => api.post<{ revoked: number }>('/auth/logout-others'),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post<void>('/auth/password', { currentPassword, newPassword }),
+  regenerateRecoveryCodes: () => api.post<{ recoveryCodes: string[] }>('/auth/recovery-codes'),
 }

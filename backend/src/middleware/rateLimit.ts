@@ -32,3 +32,22 @@ export const authRateLimiter = rateLimit({
     message: 'Demasiados intentos. Espera unos minutos antes de volver a probar.',
   },
 })
+
+/** Envíos de facturas (email/WhatsApp): 20 por hora. Frena abusos y errores en bucle. */
+export const invoiceSendRateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: env.NODE_ENV === 'test' ? 1000 : 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  keyGenerator: (req, res) => ipKeyGenerator(res.locals.clientIp ?? req.ip ?? 'unknown'),
+  message: { error: 'TooManyRequests', message: 'Demasiados envíos seguidos. Espera un poco.' },
+})
+
+/** Enlaces públicos de factura: 30 aperturas cada 15 min por IP (impide probar tokens). */
+export const publicLinkRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: env.NODE_ENV === 'test' ? 1000 : 30,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: 'Demasiadas peticiones. Inténtalo más tarde.',
+})

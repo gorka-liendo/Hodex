@@ -23,7 +23,7 @@ const validPayload = {
 
 beforeEach(() => {
   vi.mocked(sendEmail).mockClear()
-  vi.mocked(sendEmail).mockResolvedValue(undefined)
+  vi.mocked(sendEmail).mockResolvedValue({ id: null })
 })
 
 describe('GET /api/health', () => {
@@ -61,7 +61,7 @@ describe('POST /api/contact', () => {
 
   it('responde 201 aunque falle la confirmación al remitente', async () => {
     vi.mocked(sendEmail)
-      .mockResolvedValueOnce(undefined) // notificación interna OK
+      .mockResolvedValueOnce({ id: null }) // notificación interna OK
       .mockRejectedValueOnce(new Error('Resend caído')) // confirmación falla
 
     const res = await request(app).post('/api/contact').send(validPayload)

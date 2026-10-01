@@ -114,6 +114,39 @@ export const invoicesApi = {
   setPayment: (id: string, paidOn: string | null) => api.post<Invoice>(`/invoices/${id}/payment`, { paidOn }),
   rectify: (id: string, reason: string) => api.post<Invoice>(`/invoices/${id}/rectify`, { reason }),
   pdf: (id: string) => api.download(`/invoices/${id}/pdf`, 'application/pdf'),
+  sharing: (id: string) => api.get<InvoiceSharing>(`/invoices/${id}/sharing`),
+  sendEmail: (id: string, input: SendEmailInput) => api.post<InvoiceSend>(`/invoices/${id}/send/email`, input),
+  sendWhatsapp: (id: string, phone: string | null) =>
+    api.post<{ url: string; text: string; expiresAt: string }>(`/invoices/${id}/send/whatsapp`, { phone }),
+  revokeLink: (id: string, linkId: string) => api.post<void>(`/invoices/${id}/links/${linkId}/revoke`),
+}
+
+export interface SendEmailInput {
+  to: string
+  cc: string[]
+  subject: string
+  message: string
+}
+
+export interface InvoiceSend {
+  id: string
+  channel: 'email' | 'whatsapp'
+  recipient: string | null
+  sentAt: string
+}
+
+export interface InvoiceShareLink {
+  id: string
+  createdAt: string
+  expiresAt: string
+  revokedAt: string | null
+  accessCount: number
+  lastAccessedAt: string | null
+}
+
+export interface InvoiceSharing {
+  sends: InvoiceSend[]
+  links: InvoiceShareLink[]
 }
 
 /** Bajo `invoices`; el resumen también se invalida porque depende de ellas. */
@@ -121,6 +154,7 @@ export const invoiceKeys = {
   all: ['invoices'] as const,
   list: (filters: InvoiceFilters) => ['invoices', 'list', filters] as const,
   detail: (id: string) => ['invoices', 'detail', id] as const,
+  sharing: (id: string) => ['invoices', 'sharing', id] as const,
 }
 
 /** Estado legible de una factura en un momento dado. */

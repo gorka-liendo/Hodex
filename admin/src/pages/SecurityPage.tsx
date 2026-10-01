@@ -7,6 +7,7 @@ import { Button } from '../components/Button'
 import { Notice } from '../components/Notice'
 import { PageHeader } from '../components/PageHeader'
 import { formatDateTime } from '../lib/format'
+import { PasswordSection, RecoveryCodesAction } from './SecurityCredentials'
 
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -51,7 +52,7 @@ export function SecurityPage() {
       <PageHeader
         eyebrow="Cuenta"
         title="Seguridad"
-        description="Tu sesión, tus códigos de recuperación y el control de los accesos abiertos."
+        description="Tu sesión, tu contraseña, tus códigos de recuperación y el control de los accesos abiertos."
       />
 
       <section className="flex flex-col gap-6">
@@ -68,6 +69,11 @@ export function SecurityPage() {
       </section>
 
       <section className="flex flex-col gap-6">
+        <Eyebrow>Contraseña</Eyebrow>
+        <PasswordSection />
+      </section>
+
+      <section className="flex flex-col gap-6">
         <Eyebrow>Códigos de recuperación</Eyebrow>
         <div className="flex flex-col gap-4 border border-hodex-line bg-hodex-white p-8">
           <p className="font-display text-h2 leading-tight font-extralight tabular-nums">
@@ -77,13 +83,11 @@ export function SecurityPage() {
           <p className="max-w-[640px] text-hodex-gray">
             Cada código sirve una vez para entrar si no tienes el móvil a mano.
             {fewCodesLeft && (
-              <b className="font-semibold text-hodex-black">
-                {' '}
-                Te quedan pocos: pronto podrás generar nuevos desde aquí.
-              </b>
+              <b className="font-semibold text-hodex-black"> Te quedan pocos: genera unos nuevos.</b>
             )}
           </p>
         </div>
+        <RecoveryCodesAction />
       </section>
 
       <section className="flex flex-col gap-6">

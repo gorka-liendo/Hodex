@@ -49,6 +49,12 @@ const envSchema = z.object({
       .optional(),
   ),
 
+  // URL pública desde la que el cliente abre los enlaces de factura (WhatsApp).
+  // En producción la landing (www.hodex.es), que reenvía /api al backend.
+  PUBLIC_BASE_URL: z.string().url().default('http://localhost:5173'),
+  // Remitente de las facturas. Por defecto, CONTACT_FROM.
+  INVOICE_FROM: z.preprocess(emptyToUndefined, z.string().optional()),
+
   // Email (opcional). Vía preferente: API HTTP de Resend (puerto 443 — los
   // puertos SMTP salientes están bloqueados en muchos PaaS, Railway incluido).
   RESEND_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),

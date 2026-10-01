@@ -353,4 +353,84 @@ describe.skipIf(!hasTestDatabase)('autenticación del panel', () => {
       expect(rows.map((r) => r.outcome).sort()).toEqual(['failure', 'success'])
     })
   })
+
+  describe('credenciales', () => {
+    const NEW_PASSWORD = 'lampara-niebla-tejado-verde'
+
+    /** Simula que la última confirmación del 2FA fue hace 11 minutos. */
+    const expireReauth = (userId: string) =>
+      getDb()
+        .update(sessions)
+        .set({ reauthenticatedAt: new Date(Date.now() - 11 * 60_000) })
+        .where(eq(sessions.userId, userId))
+
+    it('cambiar la contraseña exige 2FA reciente', async () => {
+      const user = await createUser()
+      const { b } = await signIn(user, { code: codeFor(user) })
+      await expireReauth(user.id)
+      const res = await b.post('/auth/password', { currentPassword: PASSWORD, newPassword: NEW_PASSWORD })
+      expect(res.status).toBe(403)
+      expect(res.body.error).toBe('ReauthRequired')
+    })
+
+    it('cambia la contraseña, mantiene esta sesión y cierra las demás', async () => {
+      const user = await createUser()
+      const laptop = await signIn(user, { code: codeFor(user) })
+      const phone = await signIn(user, { code: codeFor(user, 1) })
+
+      const res = await laptop.b.post('/auth/password', { currentPassword: PASSWORD, newPassword: NEW_PASSWORD })
+      expect(res.status).toBe(204)
+      expect(findCookie(res, 'hodex_session')).toBeDefined()
+
+      expect((await laptop.b.get('/auth/session')).status).toBe(200)
+      expect((await phone.b.get('/auth/session')).status).toBe(401)
+
+      // La antigua ya no entra; la nueva sí.
+      await browser().post('/auth/login', { email: user.email, password: PASSWORD }).expect(401)
+      await browser().post('/auth/login', { email: user.email, password: NEW_PASSWORD }).expect(200)
+      expect(await auditActions(user.id)).toContain('auth.password.change:success')
+      expect(vi.mocked(sendEmail).mock.calls.some(([m]) => m.subject.includes('contraseña'))).toBe(true)
+    })
+
+    it.each([
+      ['la actual es incorrecta', { currentPassword: 'no-es-la-buena-123', newPassword: NEW_PASSWORD }, 'currentPassword'],
+      ['la nueva es débil', { currentPassword: PASSWORD, newPassword: 'corta' }, 'newPassword'],
+      ['la nueva es igual a la actual', { currentPassword: PASSWORD, newPassword: PASSWORD }, 'newPassword'],
+    ])('rechaza el cambio si %s', async (_label, body, field) => {
+      const user = await createUser()
+      const { b } = await signIn(user, { code: codeFor(user) })
+      const res = await b.post('/auth/password', body)
+      expect(res.status).toBe(400)
+      expect(res.body.details[0].path).toEqual([field])
+      await browser().post('/auth/login', { email: user.email, password: PASSWORD }).expect(200)
+    })
+
+    it('una contraseña actual incorrecta cuenta para el bloqueo', async () => {
+      const user = await createUser()
+      const { b } = await signIn(user, { code: codeFor(user) })
+      await b.post('/auth/password', { currentPassword: 'no-es-la-buena-123', newPassword: NEW_PASSWORD }).expect(400)
+      const [row] = await getDb().select().from(adminUsers).where(eq(adminUsers.id, user.id))
+      expect(row!.failedLoginCount).toBe(1)
+    })
+
+    it('regenera los códigos de recuperación: los viejos dejan de valer', async () => {
+      const user = await createUser()
+      const { b } = await signIn(user, { code: codeFor(user) })
+
+      await expireReauth(user.id)
+      await b.post('/auth/recovery-codes').expect(403)
+      await b.post('/auth/reauth', { code: codeFor(user, 1) }).expect(204)
+
+      const res = await b.post('/auth/recovery-codes')
+      expect(res.status).toBe(200)
+      const codes: string[] = res.body.recoveryCodes
+      expect(codes).toHaveLength(10)
+      expect(codes.some((c) => user.recoveryCodes.includes(c))).toBe(false)
+
+      await b.post('/auth/reauth', { recoveryCode: user.recoveryCodes[2] }).expect(401)
+      await b.post('/auth/reauth', { recoveryCode: codes[0] }).expect(204)
+      expect((await b.get('/auth/session')).body.recoveryCodesRemaining).toBe(9)
+      expect(await auditActions(user.id)).toContain('auth.recovery_codes.regenerate:success')
+    })
+  })
 })

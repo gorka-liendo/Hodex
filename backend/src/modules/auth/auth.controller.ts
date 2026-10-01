@@ -3,7 +3,8 @@ import { getRequestContext } from '../../lib/requestContext.js'
 import { recordAudit } from '../../services/audit.js'
 import { AUTH_POLICY, CHALLENGE_COOKIE, COOKIE_OPTIONS, SESSION_COOKIE } from './auth.config.js'
 import { getAuth, readCookie } from './auth.middleware.js'
-import { loginSchema, secondFactorSchema } from './auth.schema.js'
+import { changePasswordSchema, loginSchema, secondFactorSchema } from './auth.schema.js'
+import { changePassword, regenerateRecoveryCodes } from './account.service.js'
 import { completeLogin, reauthenticate, startLogin } from './login.service.js'
 import { countRemainingRecoveryCodes } from './recoveryCodes.js'
 import { revokeSessionByToken, revokeUserSessions } from './sessions.service.js'
@@ -80,4 +81,23 @@ export async function logoutOthers(req: Request, res: Response): Promise<void> {
     metadata: { revoked },
   })
   res.json({ revoked })
+}
+
+/**
+ * POST /api/admin/auth/password — cambia la contraseña. Cierra todas las
+ * sesiones y entrega una nueva para este navegador.
+ */
+export async function updatePassword(req: Request, res: Response): Promise<void> {
+  const auth = getAuth(res)
+  const input = changePasswordSchema.parse(req.body)
+  const sessionToken = await changePassword(auth.userId, input, getRequestContext(req, res))
+  res.cookie(SESSION_COOKIE, sessionToken, COOKIE_OPTIONS)
+  res.status(204).end()
+}
+
+/** POST /api/admin/auth/recovery-codes — genera códigos nuevos (se muestran una vez). */
+export async function newRecoveryCodes(req: Request, res: Response): Promise<void> {
+  const auth = getAuth(res)
+  const recoveryCodes = await regenerateRecoveryCodes(auth.userId, getRequestContext(req, res))
+  res.json({ recoveryCodes })
 }

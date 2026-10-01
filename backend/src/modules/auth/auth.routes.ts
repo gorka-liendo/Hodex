@@ -5,10 +5,12 @@ import {
   login,
   logout,
   logoutOthers,
+  newRecoveryCodes,
   reauth,
+  updatePassword,
   verifyLogin,
 } from './auth.controller.js'
-import { requireAuth } from './auth.middleware.js'
+import { requireAuth, requireRecentAuth } from './auth.middleware.js'
 
 /** Rutas de autenticación del panel, montadas en /api/admin/auth. */
 const router = Router()
@@ -22,5 +24,9 @@ router.post('/logout', logout)
 router.get('/session', requireAuth, getSession)
 router.post('/reauth', requireAuth, authRateLimiter, reauth)
 router.post('/logout-others', requireAuth, logoutOthers)
+
+// Credenciales: además exigen haber confirmado el 2FA hace poco.
+router.post('/password', requireAuth, requireRecentAuth, authRateLimiter, updatePassword)
+router.post('/recovery-codes', requireAuth, requireRecentAuth, newRecoveryCodes)
 
 export default router
