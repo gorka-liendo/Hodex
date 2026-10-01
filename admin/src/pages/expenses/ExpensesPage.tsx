@@ -133,14 +133,26 @@ export function ExpensesPage() {
         <QueryStatus error={query.error} onRetry={() => void query.refetch()} />
       ) : query.data.total === 0 ? (
         <EmptyState
-          title="No hay gastos en este periodo"
+          title={period === 'all' ? 'No hay gastos con estos filtros' : 'No hay gastos con fecha en este periodo'}
           action={
-            <LinkButton to="/gastos/nuevo" variant="dark">
-              Registrar un gasto
-            </LinkButton>
+            period === 'all' ? (
+              <LinkButton to="/gastos/nuevo" variant="dark">
+                Registrar un gasto
+              </LinkButton>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setFilter('period', 'all', 'quarter')}
+                className="self-start text-small text-hodex-black underline underline-offset-4"
+              >
+                Ver todos los gastos
+              </button>
+            )
           }
         >
-          Cambia el periodo o los filtros, o registra un gasto nuevo.
+          {period === 'all'
+            ? 'Cambia los filtros o registra un gasto nuevo.'
+            : 'Los gastos se agrupan por la fecha del ticket o la factura, no por el día en que los registras (así cuadra el IVA de cada trimestre).'}
         </EmptyState>
       ) : (
         <section aria-label="Listado de gastos" className={query.isPlaceholderData ? 'opacity-60' : ''}>

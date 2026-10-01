@@ -119,14 +119,26 @@ export function InvoicesPage() {
         <QueryStatus error={query.error} onRetry={() => void query.refetch()} />
       ) : query.data.total === 0 ? (
         <EmptyState
-          title="No hay facturas con estos filtros"
+          title={period === 'all' ? 'No hay facturas con estos filtros' : 'No hay facturas con fecha en este periodo'}
           action={
-            <LinkButton to="/facturas/nueva" variant="dark">
-              Crear una factura
-            </LinkButton>
+            period === 'all' ? (
+              <LinkButton to="/facturas/nueva" variant="dark">
+                Crear una factura
+              </LinkButton>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setFilter('period', 'all', 'year')}
+                className="self-start text-small text-hodex-black underline underline-offset-4"
+              >
+                Ver todas las facturas
+              </button>
+            )
           }
         >
-          Crea un borrador, revísalo y emítelo cuando esté listo: al emitirlo recibe su número definitivo.
+          {period === 'all'
+            ? 'Crea un borrador, revísalo y emítelo cuando esté listo: al emitirlo recibe su número definitivo.'
+            : 'Las facturas se agrupan por su fecha de emisión.'}
         </EmptyState>
       ) : (
         <section aria-label="Listado de facturas" className={query.isPlaceholderData ? 'opacity-60' : ''}>
