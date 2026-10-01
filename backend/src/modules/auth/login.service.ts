@@ -55,7 +55,7 @@ async function findUserById(id: string): Promise<AdminUser | undefined> {
  * Suma un fallo al contador (de forma atómica) y, al llegar al umbral, bloquea
  * la cuenta. Cada fallo extra duplica el bloqueo hasta el máximo.
  */
-async function registerFailure(
+export async function registerFailure(
   user: AdminUser,
   context: RequestContext,
   now: Date,

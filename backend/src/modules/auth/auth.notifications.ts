@@ -65,3 +65,21 @@ export function notifyRecoveryCodeUsed(
     ...FOOTER,
   ])
 }
+
+export function notifyPasswordChanged(to: string, context: RequestContext, when = new Date()): void {
+  notify(to, 'Has cambiado la contraseña del panel', [
+    'La contraseña de tu panel de gestión se ha cambiado y se han cerrado las demás sesiones.',
+    '',
+    ...describe(context, when),
+    ...FOOTER,
+  ])
+}
+
+export function notifyRecoveryCodesRegenerated(to: string, context: RequestContext, when = new Date()): void {
+  notify(to, 'Nuevos códigos de recuperación', [
+    'Se han generado códigos de recuperación nuevos. Los anteriores ya no sirven.',
+    '',
+    ...describe(context, when),
+    ...FOOTER,
+  ])
+}

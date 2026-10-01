@@ -22,3 +22,13 @@ export const secondFactorSchema = z.union([totpCode, recoveryCode])
 
 export type LoginInput = z.infer<typeof loginSchema>
 export type SecondFactorInput = z.infer<typeof secondFactorSchema>
+
+/** Cambio de contraseña. La política se comprueba en el servicio (necesita el email). */
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Escribe tu contraseña actual').max(PASSWORD_MAX_LENGTH),
+    newPassword: z.string().min(1, 'Escribe la contraseña nueva').max(PASSWORD_MAX_LENGTH),
+  })
+  .strict()
+
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>
