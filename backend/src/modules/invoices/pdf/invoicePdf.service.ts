@@ -52,9 +52,15 @@ export function pdfFilename(data: Pick<InvoicePdfData, 'fullNumber'>, invoiceId:
     : `borrador-${invoiceId.slice(0, 8)}.pdf`
 }
 
-export async function generateInvoicePdf(invoiceId: string, actor: Actor) {
+/** Genera el PDF de una factura (sin efectos: no audita). */
+export async function buildInvoicePdf(invoiceId: string) {
   const data = await pdfData(invoiceId)
-  const pdf = await renderInvoicePdf(data)
+  return { pdf: await renderInvoicePdf(data), filename: pdfFilename(data, invoiceId), data }
+}
+
+/** Descarga desde el panel: genera el PDF y deja constancia en la auditoría. */
+export async function generateInvoicePdf(invoiceId: string, actor: Actor) {
+  const { pdf, filename, data } = await buildInvoicePdf(invoiceId)
   // Descargar una factura es exportar datos de un cliente: queda registrado.
   await recordAudit({
     action: 'invoice.pdf.download',
@@ -63,5 +69,5 @@ export async function generateInvoicePdf(invoiceId: string, actor: Actor) {
     context: actor.context,
     metadata: { invoiceId, fullNumber: data.fullNumber },
   })
-  return { pdf, filename: pdfFilename(data, invoiceId) }
+  return { pdf, filename }
 }

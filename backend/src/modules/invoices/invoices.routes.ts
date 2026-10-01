@@ -5,6 +5,10 @@ import { getAuth } from '../auth/auth.middleware.js'
 import type { Actor } from '../contacts/contacts.service.js'
 import { issueInvoice, verifyInvoiceChain } from './invoices.issue.js'
 import { generateInvoicePdf } from './pdf/invoicePdf.service.js'
+import { sendEmailSchema, whatsappSchema } from './sharing/invoiceSharing.schema.js'
+import { createWhatsappShare, getSharing, revokeShareLink, sendInvoiceEmail } from './sharing/invoiceSharing.service.js'
+import { invoiceSendRateLimiter } from '../../middleware/rateLimit.js'
+import { AppError } from '../../lib/AppError.js'
 import { invoiceDraftSchema, invoiceListQuerySchema, paymentSchema, rectifySchema } from './invoices.schema.js'
 import {
   createDraft,
@@ -49,6 +53,31 @@ router.get('/:id/pdf', async (req, res) => {
     .set('Content-Disposition', `attachment; filename="${filename}"`)
     .set('Content-Length', String(pdf.length))
     .send(pdf)
+})
+
+// ─── Envíos ──────────────────────────────────────────────────────────────────
+
+router.get('/:id/sharing', async (req, res) => {
+  res.json(await getSharing(parseIdParam(req.params.id)))
+})
+
+router.post('/:id/send/email', invoiceSendRateLimiter, async (req, res) => {
+  const id = parseIdParam(req.params.id)
+  res.status(201).json(await sendInvoiceEmail(id, sendEmailSchema.parse(req.body), actorOf(req, res)))
+})
+
+router.post('/:id/send/whatsapp', invoiceSendRateLimiter, async (req, res) => {
+  const id = parseIdParam(req.params.id)
+  const { phone } = whatsappSchema.parse(req.body)
+  res.status(201).json(await createWhatsappShare(id, phone, actorOf(req, res)))
+})
+
+router.post('/:id/links/:linkId/revoke', async (req, res) => {
+  const id = parseIdParam(req.params.id)
+  const linkId = String(req.params.linkId)
+  if (!/^[a-f0-9]{64}$/.test(linkId)) throw new AppError(404, 'Enlace no encontrado.', { code: 'NotFound' })
+  await revokeShareLink(id, linkId, actorOf(req, res))
+  res.status(204).end()
 })
 
 // Solo borradores (una emitida responde 409).

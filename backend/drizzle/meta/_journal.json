@@ -43,6 +43,13 @@
       "when": 1790755657727,
       "tag": "0005_invoices_immutability",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790855426993,
+      "tag": "0006_invoice_sharing",
+      "breakpoints": true
     }
   ]
 }

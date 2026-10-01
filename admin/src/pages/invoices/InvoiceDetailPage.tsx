@@ -12,6 +12,7 @@ import { InvoiceDocument } from '../../components/InvoiceDocument'
 import { QueryStatus } from '../../components/lists'
 import { Notice } from '../../components/Notice'
 import { PageHeader } from '../../components/PageHeader'
+import { InvoiceSendPanel } from './InvoiceSendPanel'
 import { formatDateTime } from '../../lib/format'
 import { formatCents, formatRate } from '../../lib/money'
 import { formatShortDate, todayInSpain } from '../../lib/periods'
@@ -63,6 +64,7 @@ function InvoiceDetail({ invoice }: { invoice: Invoice }) {
       />
 
       {isDraft ? <DraftActions invoice={invoice} /> : <IssuedActions invoice={invoice} />}
+      {!isDraft && <InvoiceSendPanel invoice={invoice} />}
 
       {invoice.rectifiedBy.length > 0 && (
         <Notice tone="info">

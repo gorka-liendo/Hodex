@@ -21,12 +21,28 @@ function getTransporter(): Transporter | null {
   return transporter
 }
 
+export interface EmailAttachment {
+  filename: string
+  content: Buffer
+}
+
 export interface EmailMessage {
   subject: string
   text: string
+  /** Versión HTML opcional (los clientes que no la muestren usan `text`). */
+  html?: string
   replyTo?: string
   /** Destinatario. Por defecto, CONTACT_TO (buzón interno del equipo). */
   to?: string
+  cc?: string[]
+  /** Remitente. Por defecto, CONTACT_FROM. */
+  from?: string
+  attachments?: EmailAttachment[]
+}
+
+export interface EmailResult {
+  /** Id del mensaje en el proveedor (Resend), si lo hay. */
+  id: string | null
 }
 
 /**
@@ -45,11 +61,14 @@ function getResendKey(): string | undefined {
   return undefined
 }
 
-export async function sendEmail(message: EmailMessage): Promise<void> {
+export async function sendEmail(message: EmailMessage): Promise<EmailResult> {
+  const to = message.to ?? env.CONTACT_TO
+  const from = message.from ?? env.CONTACT_FROM ?? env.CONTACT_TO
+
   // Vía preferente: API HTTP de Resend (443). Los puertos SMTP salientes están
   // bloqueados en muchos PaaS (Railway incluido), así que SMTP solo es fallback.
   const resendKey = getResendKey()
-  if (resendKey && env.CONTACT_TO) {
+  if (resendKey && to) {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -57,18 +76,29 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: env.CONTACT_FROM ?? env.CONTACT_TO,
-        to: [message.to ?? env.CONTACT_TO],
+        from,
+        to: [to],
+        ...(message.cc?.length ? { cc: message.cc } : {}),
         subject: message.subject,
         text: message.text,
+        ...(message.html ? { html: message.html } : {}),
         ...(message.replyTo ? { reply_to: message.replyTo } : {}),
+        ...(message.attachments?.length
+          ? {
+              attachments: message.attachments.map((a) => ({
+                filename: a.filename,
+                content: a.content.toString('base64'),
+              })),
+            }
+          : {}),
       }),
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(30_000),
     })
     if (!res.ok) {
       throw new Error(`Resend API ${res.status}: ${await res.text()}`)
     }
-    return
+    const body = (await res.json().catch(() => ({}))) as { id?: string }
+    return { id: body.id ?? null }
   }
 
   const tx = getTransporter()
@@ -78,15 +108,24 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
       { subject: message.subject },
       'Email no configurado — el mensaje se registra en consola en lugar de enviarse',
     )
-    logger.info({ email: message }, 'Contenido del email (modo consola)')
-    return
+    // Los adjuntos se resumen (nombre y tamaño): nunca se vuelca su contenido al log.
+    const { attachments, ...rest } = message
+    logger.info(
+      { email: { ...rest, to, attachments: attachments?.map((a) => ({ filename: a.filename, bytes: a.content.length })) } },
+      'Contenido del email (modo consola)',
+    )
+    return { id: null }
   }
 
-  await tx.sendMail({
-    from: env.CONTACT_FROM ?? env.CONTACT_TO,
-    to: message.to ?? env.CONTACT_TO,
+  const info = await tx.sendMail({
+    from,
+    to,
+    ...(message.cc?.length ? { cc: message.cc } : {}),
     subject: message.subject,
     text: message.text,
+    ...(message.html ? { html: message.html } : {}),
     ...(message.replyTo ? { replyTo: message.replyTo } : {}),
+    ...(message.attachments?.length ? { attachments: message.attachments } : {}),
   })
+  return { id: info.messageId ?? null }
 }
