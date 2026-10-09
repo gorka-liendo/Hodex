@@ -10,3 +10,9 @@ node_modules/
 dist/
 .vercel
 .env*
+
+# Copias locales de assets de marca (los originales viven en ~/Documents/Hodex/Media).
+# Nunca en public/: todo lo que hay ahí se publica en www.hodex.es.
+frontend/public/Claude outputs/
+frontend/public/favicon.png
+frontend/public/logo-hodex.png
