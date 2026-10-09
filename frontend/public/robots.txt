@@ -15,6 +15,7 @@ User-agent: CCBot
 User-agent: Bytespider
 User-agent: meta-externalagent
 User-agent: cohere-training-data-crawler
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 Disallow: /
 
 Sitemap: https://www.hodex.es/sitemap.xml
