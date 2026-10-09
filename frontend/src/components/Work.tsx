@@ -31,10 +31,10 @@ const PROJECTS: Project[] = [
     domain: 'golink.es',
     href: 'https://golink.es',
     discipline: 'IA · Creator economy',
-    tagline: 'El método de los creadores que sigues.',
+    tagline: 'Tu bio, ahora factura.',
     description:
-      'Marketplace de creadores: guías, plantillas, cursos y planes de fitness, viajes, finanzas y muchos nichos más. Se compra una vez y es tuyo para siempre.',
-    tags: ['IA', 'Marketplace', 'Creators'],
+      'Una página con su marca para el enlace de la bio: los creadores venden guías y planes hechos con IA y con su método, y cobran cada venta automáticamente.',
+    tags: ['IA', 'Link in bio', 'Creators'],
     status: '2026 — En desarrollo',
     image: golinkImg,
   },
