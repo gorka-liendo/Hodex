@@ -1,19 +1,37 @@
+import { Link } from 'react-router-dom'
+import { PROJECTS } from '../content/projects'
+import { SERVICES } from '../content/services'
 import Reveal from './Reveal'
 
 /**
  * Footer — cierre completo fiel al design system ("Get in touch" footer):
- * cabecera grande con el año, grid de info en 3 columnas (hairlines), nav,
+ * cabecera grande con el año, grid de info (estudio, servicios, proyectos,
+ * contacto y ubicación),
  * wordmark HODEX a sangre con degradado metálico (text-metallic) y línea
  * legal con enlace "volver arriba". Sin CTA de cobre — ya vive en Contact.
  */
 
-const NAV = [
-  { label: 'Quiénes somos', href: '/#about' },
-  { label: 'Proceso', href: '/#process' },
-  { label: 'Proyectos', href: '/#work' },
-  { label: 'FAQ', href: '/#faq' },
-  { label: 'Contacto', href: '/#contact' },
-] as const
+/** Columnas de enlaces: también ayudan a Google a descubrir cada página. */
+const COLUMNS = [
+  {
+    title: 'Servicios',
+    links: [
+      ...SERVICES.map((s) => ({ label: s.name, href: `/servicios/${s.slug}` })),
+      { label: 'Todos los servicios', href: '/servicios' },
+    ],
+  },
+  {
+    title: 'Explora',
+    links: [
+      ...PROJECTS.map((p) => ({ label: p.name, href: `/proyectos/${p.slug}` })),
+      { label: 'Proceso', href: '/#process' },
+      { label: 'Preguntas frecuentes', href: '/#faq' },
+    ],
+  },
+]
+
+const linkClass =
+  'group relative inline-block text-[15px] text-hodex-white/70 transition-colors duration-300 hover:text-hodex-white'
 
 export default function Footer() {
   const year = new Date().getFullYear()
@@ -36,53 +54,56 @@ export default function Footer() {
 
         {/* ===== Grid de info ===== */}
         <Reveal delay={100}>
-          <div className="grid gap-10 py-10 md:grid-cols-3 md:py-14">
+          <div className="grid gap-10 py-10 sm:grid-cols-2 md:grid-cols-4 md:py-14">
             <div>
               <div className="mb-3 text-eyebrow uppercase tracking-eyebrow text-hodex-white/50">
                 Estudio
               </div>
               <p className="m-0 max-w-[280px] text-small leading-body text-hodex-white/70">
-                Estudio full-cycle de IA, automatización y producto digital.
+                Estudio de diseño web, aplicaciones a medida e inteligencia artificial.
                 Estrategia, diseño y desarrollo bajo el mismo techo.
               </p>
             </div>
+
+            {COLUMNS.map((column) => (
+              <nav key={column.title} aria-label={column.title}>
+                <div className="mb-3 text-eyebrow uppercase tracking-eyebrow text-hodex-white/50">
+                  {column.title}
+                </div>
+                <ul className="m-0 flex list-none flex-col gap-2 p-0">
+                  {column.links.map((link) => (
+                    <li key={link.href}>
+                      <Link to={link.href} className={linkClass}>
+                        {link.label}
+                        <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-hodex-white/60 transition-transform duration-300 ease-out group-hover:scale-x-100" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
 
             <div>
               <div className="mb-3 text-eyebrow uppercase tracking-eyebrow text-hodex-white/50">
                 Contacto
               </div>
-              <p className="m-0">
-                <a
-                  href="mailto:team@hodex.es"
-                  className="text-[15px] text-hodex-white transition-opacity duration-300 hover:opacity-70"
-                >
+              <p className="m-0 flex flex-col gap-2">
+                <a href="mailto:team@hodex.es" className={linkClass}>
                   team@hodex.es
                 </a>
+                <Link to="/contacto" className={linkClass}>
+                  Formulario de contacto
+                </Link>
               </p>
               <div className="mb-3 mt-6 text-eyebrow uppercase tracking-eyebrow text-hodex-white/50">
                 Ubicación
               </div>
-              <p className="m-0 text-[15px] text-hodex-white/70">España · Remoto</p>
+              <p className="m-0 text-[15px] leading-body text-hodex-white/70">
+                Castro Urdiales, Cantabria
+                <br />
+                Proyectos en toda España
+              </p>
             </div>
-
-            <nav aria-label="Enlaces del pie">
-              <div className="mb-3 text-eyebrow uppercase tracking-eyebrow text-hodex-white/50">
-                Índice
-              </div>
-              <ul className="m-0 flex list-none flex-col gap-2 p-0">
-                {NAV.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      className="group relative inline-block text-[15px] text-hodex-white/70 transition-colors duration-300 hover:text-hodex-white"
-                    >
-                      {link.label}
-                      <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-0 bg-hodex-white/60 transition-transform duration-300 ease-out group-hover:scale-x-100" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
           </div>
         </Reveal>
       </div>
@@ -101,18 +122,12 @@ export default function Footer() {
       <div className="mx-auto mt-12 flex max-w-[1320px] flex-col gap-4 border-t border-hodex-line-dark px-6 pt-6 text-small text-hodex-white/50 md:flex-row md:items-center md:justify-between">
         <p className="m-0">© {year} Hodex. Todos los derechos reservados.</p>
         <nav aria-label="Enlaces legales" className="flex gap-6">
-          <a
-            href="/legal/aviso-legal"
-            className="transition-colors duration-300 hover:text-hodex-white"
-          >
+          <Link to="/legal/aviso-legal" className="transition-colors duration-300 hover:text-hodex-white">
             Aviso legal
-          </a>
-          <a
-            href="/legal/privacidad"
-            className="transition-colors duration-300 hover:text-hodex-white"
-          >
+          </Link>
+          <Link to="/legal/privacidad" className="transition-colors duration-300 hover:text-hodex-white">
             Privacidad
-          </a>
+          </Link>
         </nav>
         <a
           href="/#top"

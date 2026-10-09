@@ -11,27 +11,27 @@ import Reveal from './Reveal'
 const STEPS = [
   {
     index: '01',
-    title: 'Discovery Call',
-    desc: 'Una llamada para entender tus procesos actuales y detectar dónde la automatización y la IA tienen mayor impacto en tu negocio. Sin compromiso y sin jerga técnica.',
+    title: 'Primera llamada',
+    desc: 'Una llamada para entender tu negocio y lo que necesitas: una web, una aplicación o automatizar procesos con IA. Sin compromiso y sin jerga técnica.',
   },
   {
     index: '02',
-    title: 'Workflow Mapping',
-    desc: 'Mapeamos el flujo de trabajo y diseñamos la solución a medida de tu operación: qué se automatiza, qué se construye y en qué orden, con alcance y presupuesto cerrados.',
+    title: 'Mapa del proyecto',
+    desc: 'Definimos la solución a medida: qué se diseña, qué se construye o automatiza y en qué orden, con alcance, plazos y presupuesto cerrados.',
   },
   {
     index: '03',
-    title: 'AI & Web Implementation',
-    desc: 'Desarrollo del producto: agentes de IA, integraciones con tus herramientas (CRM, soporte, operaciones) y plataformas web construidas para escalar.',
+    title: 'Diseño y desarrollo',
+    desc: 'Diseño y desarrollo por fases: webs, aplicaciones, integraciones con tus herramientas y automatizaciones con IA, con avances que puedes ver desde las primeras semanas.',
   },
   {
     index: '04',
-    title: 'Ongoing Support',
+    title: 'Soporte continuo',
     desc: 'Mantenimiento, iteración y escalado continuo del sistema entregado. El producto evoluciona con el negocio — no termina en la entrega.',
   },
 ] as const
 
-export default function Process() {
+export default function Process({ index = '03' }: { index?: string }) {
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
@@ -41,7 +41,7 @@ export default function Process() {
           <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">
             Cómo trabajamos
             <span className="h-px max-w-[220px] flex-1 bg-hodex-line-dark" />
-            <span className="text-hodex-white/30">02</span>
+            <span className="text-hodex-white/30">{index}</span>
           </div>
           <h2 className="mt-6 font-display text-h2 font-light leading-tight tracking-headline">
             Proceso

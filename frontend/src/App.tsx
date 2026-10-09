@@ -1,6 +1,7 @@
 import Header from './components/Header'
 import Reveal from './components/Reveal'
 import About from './components/About'
+import Services from './components/Services'
 import Process from './components/Process'
 import Work from './components/Work'
 import Philosophy from './components/Philosophy'
@@ -34,7 +35,7 @@ function App() {
             {/* Entrada escalonada al cargar: eyebrow → wordmark → párrafo */}
             <Reveal>
               <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">
-                Full-cycle digital product creation
+                Diseño web · Aplicaciones · Inteligencia artificial
                 <span className="h-px max-w-[220px] flex-1 bg-hodex-line-dark" />
               </div>
             </Reveal>
@@ -44,7 +45,7 @@ function App() {
                 {/* Contexto para buscadores y lectores de pantalla — invisible */}
                 <span className="sr-only">
                   {' '}
-                  — Automatización con IA y productos web a medida
+                  — Diseño web, aplicaciones a medida e inteligencia artificial en Cantabria
                 </span>
               </h1>
             </Reveal>
@@ -54,8 +55,8 @@ function App() {
                   Diseño y producto digital de gama alta.
                 </b>{' '}
                 <span className="text-hodex-white/55">
-                  Construimos experiencias precisas, minimalistas y duraderas para
-                  marcas que exigen estatus sin ruido.
+                  Webs, aplicaciones y automatización con IA para empresas que quieren
+                  hacer las cosas bien. Desde Castro Urdiales, para toda España.
                 </span>
               </p>
             </Reveal>
@@ -65,7 +66,7 @@ function App() {
                 href="#contact"
                 className="group mt-10 inline-flex items-center gap-2 bg-copper-gradient px-7 py-4 text-eyebrow font-semibold uppercase tracking-eyebrow text-hodex-white transition-all duration-300 hover:-translate-y-px hover:shadow-[0_10px_30px_rgba(180,56,1,0.35)]"
               >
-                Book a strategy call
+                Reserva una llamada
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   &rarr;
                 </span>
@@ -77,10 +78,13 @@ function App() {
         {/* ABOUT — quiénes somos */}
         <About />
 
-        {/* PROCESS — cómo trabajamos (acordeón oscuro) */}
+        {/* SERVICIOS — cada tarjeta enlaza a su página */}
+        <Services />
+
+        {/* PROCESO — cómo trabajamos (acordeón oscuro) */}
         <Process />
 
-        {/* WORK — proyectos */}
+        {/* PROYECTOS — cada uno enlaza a su caso */}
         <Work />
 
         {/* PHILOSOPHY — cita con ghost wordmark */}

@@ -6,7 +6,7 @@ import Footer from '../components/Footer'
  * LegalLayout — plantilla de las páginas legales (aviso legal, privacidad).
  * Mantiene header y footer del sitio, y presenta el contenido con el design
  * system: eyebrow + h1 display light + prose con hairlines entre secciones.
- * Fija el <title> por página y hace scroll al inicio al montar.
+ * Hace scroll al inicio al montar (el <title> lo pone <Seo />).
  */
 export default function LegalLayout({
   eyebrow,
@@ -20,12 +20,8 @@ export default function LegalLayout({
   children: ReactNode
 }) {
   useEffect(() => {
-    document.title = `${title} — Hodex`
     window.scrollTo(0, 0)
-    return () => {
-      document.title = 'Hodex — Automatización con IA y productos web a medida'
-    }
-  }, [title])
+  }, [])
 
   return (
     <div>

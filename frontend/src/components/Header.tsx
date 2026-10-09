@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 
 /**
  * Header flotante de Hodex — barra despegada del borde, esquinas a 90° (radius 0,
@@ -10,14 +11,19 @@ import { useEffect, useState } from 'react'
  */
 
 const LINKS = [
-  { label: 'About', href: '/#about' },
-  { label: 'Process', href: '/#process' },
-  { label: 'Work', href: '/#work' },
-  { label: 'FAQ', href: '/#faq' },
-  { label: 'Contact', href: '/#contact' },
+  { label: 'Servicios', href: '/servicios', match: '/servicios' },
+  { label: 'Proyectos', href: '/#work', match: '/proyectos' },
+  { label: 'Proceso', href: '/#process' },
+  { label: 'Preguntas', href: '/#faq' },
+  { label: 'Contacto', href: '/contacto', match: '/contacto' },
 ] as const
 
+/** ¿Estamos en la sección de ese enlace? (incluye sus subpáginas). */
+const isActive = (link: (typeof LINKS)[number], pathname: string) =>
+  'match' in link && (pathname === link.match || pathname.startsWith(`${link.match}/`))
+
 export default function Header() {
+  const { pathname } = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
 
@@ -50,39 +56,48 @@ export default function Header() {
           }`}
         >
           {/* Wordmark */}
-          <a href="/#top" className="flex items-center gap-2 transition-opacity hover:opacity-70">
+          <Link to="/" aria-label="Hodex, inicio" className="flex items-center gap-2 transition-opacity hover:opacity-70">
             <img
               src="/hodex-isotipo.svg"
-              alt="Hodex"
-              className="h-6 md:h-7"
+              alt=""
+              width={221}
+              height={200}
+              className="h-6 w-auto md:h-7"
             />
             <span className="font-display text-xl font-light tracking-headline text-hodex-black">
               HODEX
             </span>
-          </a>
+          </Link>
 
           {/* Nav desktop */}
           <ul className="hidden items-center gap-8 md:flex">
             {LINKS.map((link) => (
               <li key={link.href}>
-                <a
-                  href={link.href}
-                  className="group relative text-eyebrow uppercase tracking-eyebrow text-hodex-gray transition-colors duration-300 hover:text-hodex-black"
+                <Link
+                  to={link.href}
+                  aria-current={isActive(link, pathname) ? 'page' : undefined}
+                  className={`group relative text-eyebrow uppercase tracking-eyebrow transition-colors duration-300 hover:text-hodex-black ${
+                    isActive(link, pathname) ? 'text-hodex-black' : 'text-hodex-gray'
+                  }`}
                 >
                   {link.label}
-                  <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-hodex-black transition-transform duration-300 ease-out group-hover:scale-x-100" />
-                </a>
+                  <span
+                    className={`absolute -bottom-1.5 left-0 h-px w-full origin-left bg-hodex-black transition-transform duration-300 ease-out group-hover:scale-x-100 ${
+                      isActive(link, pathname) ? 'scale-x-100' : 'scale-x-0'
+                    }`}
+                  />
+                </Link>
               </li>
             ))}
           </ul>
 
           {/* CTA desktop (negro, nunca cobre) */}
-          <a
-            href="/#contact"
+          <Link
+            to="/contacto"
             className="hidden items-center bg-hodex-black px-5 py-2.5 text-eyebrow uppercase tracking-eyebrow text-hodex-white transition-all duration-300 hover:-translate-y-px hover:shadow-[0_6px_20px_rgba(17,16,16,0.25)] md:inline-flex"
           >
-            Let&rsquo;s talk
-          </a>
+            Hablemos
+          </Link>
 
           {/* Hamburguesa (móvil) */}
           <button
@@ -121,8 +136,8 @@ export default function Header() {
           <ul className="flex flex-col divide-y divide-hodex-line px-5">
             {LINKS.map((link, i) => (
               <li key={link.href}>
-                <a
-                  href={link.href}
+                <Link
+                  to={link.href}
                   onClick={() => setOpen(false)}
                   style={{ transitionDelay: open ? `${100 + i * 60}ms` : '0ms' }}
                   className={`block py-4 font-display text-2xl font-light uppercase tracking-headline text-hodex-black transition-all duration-300 ${
@@ -130,18 +145,18 @@ export default function Header() {
                   }`}
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
           <div className="px-5 pb-5 pt-2">
-            <a
-              href="/#contact"
+            <Link
+              to="/contacto"
               onClick={() => setOpen(false)}
               className="block bg-hodex-black py-4 text-center text-eyebrow uppercase tracking-eyebrow text-hodex-white transition-opacity hover:opacity-90"
             >
-              Let&rsquo;s talk
-            </a>
+              Hablemos
+            </Link>
           </div>
         </div>
       </div>

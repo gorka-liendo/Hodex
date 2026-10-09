@@ -15,10 +15,10 @@ export default function Reveal({
   className?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
-  // Sin animación si el usuario la ha desactivado (estado inicial, no efecto).
-  const [inView, setInView] = useState(
-    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
+  // Igual en el servidor (prerender) y en el navegador, para que la hidratación
+  // cuadre. Quien desactiva las animaciones lo ve todo ya visible por CSS
+  // (motion-reduce:…), sin depender de este estado.
+  const [inView, setInView] = useState(false)
 
   useEffect(() => {
     const el = ref.current
@@ -44,7 +44,7 @@ export default function Reveal({
     <div
       ref={ref}
       style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-all duration-700 ease-out ${
+      className={`transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${
         inView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
       } ${className}`}
     >

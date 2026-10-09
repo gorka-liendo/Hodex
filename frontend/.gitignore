@@ -27,3 +27,4 @@ dist-ssr
 
 # Media original sin comprimir — solo en local, no se versiona ni se despliega
 media-src/
+dist-server
