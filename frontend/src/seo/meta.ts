@@ -16,6 +16,8 @@ export type PageMeta = {
   jsonLd: object[]
   /** Fuera del sitemap y de los buscadores (p. ej. la 404). */
   noindex?: boolean
+  /** Etiquetas extra del <head> solo para esta página (p. ej. precargar el hero). */
+  extraHead?: string[]
 }
 
 const BUSINESS_ID = `${SITE.url}/#negocio`
@@ -81,6 +83,8 @@ export const homeMeta: PageMeta = {
   title: SITE.defaultTitle,
   description: SITE.defaultDescription,
   jsonLd: [graph(business, website, faqPage(HOME_FAQS))],
+  // El póster del vídeo es lo primero grande que se pinta (LCP): que llegue cuanto antes.
+  extraHead: ['<link rel="preload" as="image" href="/hero-poster-720.jpg" fetchpriority="high" />'],
 }
 
 export const servicesMeta: PageMeta = {
@@ -193,6 +197,7 @@ export function headTags(meta: PageMeta): string {
     `<meta name="twitter:title" content="${escapeAttr(meta.title)}" />`,
     `<meta name="twitter:description" content="${escapeAttr(meta.description)}" />`,
     // `<` escapado: un texto con "</script>" no puede cerrar el bloque.
+    ...(meta.extraHead ?? []),
     ...meta.jsonLd.map((data) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`),
   ]
   return tags.join('\n    ')

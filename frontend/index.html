@@ -21,6 +21,12 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://www.hodex.es/og-image.png" />
 
+    <!-- Rendimiento: en navegadores compatibles, la página a la que vas se
+         precarga al pasar el ratón por el enlace (navegación casi instantánea). -->
+    <script type="speculationrules">
+      { "prefetch": [{ "where": { "and": [{ "href_matches": "/*" }, { "not": { "href_matches": "/api/*" } }] }, "eagerness": "moderate" }] }
+    </script>
+
     <!-- Rendimiento: resolver los dominios de Google Fonts cuanto antes -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
