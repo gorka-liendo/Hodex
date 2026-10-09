@@ -1,4 +1,20 @@
+# Buscadores (Google, Bing…) y buscadores de IA: pueden leer la web para
+# mostrarla en sus resultados y respuestas.
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 Allow: /
+
+# Rastreadores que recopilan textos para ENTRENAR modelos de IA: no.
+# (No afecta a Google Search, ChatGPT Search, Perplexity ni Claude como buscadores.)
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: meta-externalagent
+User-agent: cohere-training-data-crawler
+Disallow: /
 
 Sitemap: https://www.hodex.es/sitemap.xml

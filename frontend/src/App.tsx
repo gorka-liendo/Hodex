@@ -24,11 +24,11 @@ function App() {
             muted
             playsInline
             preload="metadata"
-            poster="/hero-poster.jpg"
+            poster="/hero-poster-720.jpg"
             aria-hidden="true"
             className="absolute inset-0 h-full w-full object-cover motion-safe:animate-hero-zoom"
           >
-            <source src="/video2.mp4" type="video/mp4" />
+            <source src="/hero.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-black/60" />
           <div className="relative z-10 mx-auto w-full max-w-[1320px] px-6">
