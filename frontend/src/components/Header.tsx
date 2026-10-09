@@ -52,7 +52,7 @@ export default function Header() {
           {/* Wordmark */}
           <a href="/#top" className="flex items-center gap-2 transition-opacity hover:opacity-70">
             <img
-              src="/Honma_Interior_logo.svg"
+              src="/hodex-isotipo.svg"
               alt="Hodex"
               className="h-6 md:h-7"
             />
