@@ -1,88 +1,15 @@
+import { Link } from 'react-router-dom'
+import { PROJECTS, type Project } from '../content/projects'
+import BrowserMock from './BrowserMock'
 import Reveal from './Reveal'
-import golinkImg from '../assets/golink.jpg'
-import mytrainerhubImg from '../assets/mytrainerhub.jpg'
 
 /**
- * Work — sección "Selected work". Filas editoriales grandes en zigzag alternado,
- * fiel al design system: índice numerado, eyebrow, Helvetica light, hairlines.
+ * Work — proyectos. Filas editoriales grandes en zigzag alternado, fiel al
+ * design system: índice numerado, eyebrow, Helvetica light, hairlines.
  * El único cobre aparece en el underline del enlace SOLO en hover (regla
  * "cobre 1× por pantalla"): en reposo la sección es 100% monocroma.
- *
- * NOTA: copy provisional basada en el tagline real de cada sitio. A refinar.
+ * Cada proyecto enlaza a su caso (/proyectos/<slug>) y, aparte, a su web.
  */
-
-type Project = {
-  index: string
-  name: string
-  domain: string
-  href: string
-  discipline: string
-  tagline: string
-  description: string
-  tags: string[]
-  status: string
-  image: string
-}
-
-const PROJECTS: Project[] = [
-  {
-    index: '01',
-    name: 'GoLink',
-    domain: 'golink.es',
-    href: 'https://golink.es',
-    discipline: 'IA · Creator economy',
-    tagline: 'Tu bio, ahora factura.',
-    description:
-      'Una página con su marca para el enlace de la bio: los creadores venden guías y planes hechos con IA y con su método, y cobran cada venta automáticamente.',
-    tags: ['IA', 'Link in bio', 'Creators'],
-    status: '2026 — En desarrollo',
-    image: golinkImg,
-  },
-  {
-    index: '02',
-    name: 'MyTrainerHub',
-    domain: 'mytrainerhub.es',
-    href: 'https://mytrainerhub.es',
-    discipline: 'IA · Fitness',
-    tagline: 'Menos Excel. Más resultados.',
-    description:
-      'Software para entrenadores personales: sustituye el caos de las hojas de cálculo por planes, seguimiento de clientes y automatización con IA, sin perder el trato humano.',
-    tags: ['IA', 'Fitness', 'SaaS'],
-    status: '2026 — En desarrollo',
-    image: mytrainerhubImg,
-  },
-]
-
-function BrowserMock({ project }: { project: Project }) {
-  return (
-    /* Toda la "pantalla" es clicable y lleva al proyecto, igual que el enlace de texto */
-    <a
-      href={project.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={`Visitar ${project.domain}`}
-      className="block overflow-hidden border border-hodex-line bg-hodex-off-white transition-shadow duration-500 hover:shadow-[0_16px_50px_rgba(17,16,16,0.12)]">
-      {/* Barra del navegador — puntos cuadrados (radius 0, detalle de marca) */}
-      <div className="flex items-center gap-1.5 border-b border-hodex-line px-4 py-3">
-        <span className="h-2 w-2 bg-hodex-black/20" />
-        <span className="h-2 w-2 bg-hodex-black/20" />
-        <span className="h-2 w-2 bg-hodex-black/20" />
-        <span className="ml-3 font-body text-[11px] tracking-wide text-hodex-gray">
-          {project.domain}
-        </span>
-      </div>
-      {/* Captura real de la landing, hace zoom sutil al hover de la fila */}
-      <div className="aspect-[16/10] overflow-hidden bg-hodex-black">
-        <img
-          src={project.image}
-          alt={`Landing de ${project.name}`}
-          loading="lazy"
-          className="h-full w-full object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
-        />
-      </div>
-    </a>
-  )
-}
 
 function ProjectRow({ project, reverse }: { project: Project; reverse: boolean }) {
   return (
@@ -94,46 +21,45 @@ function ProjectRow({ project, reverse }: { project: Project; reverse: boolean }
             <span className="inline-flex h-8 w-10 items-center justify-center border border-hodex-line text-small text-hodex-black">
               {project.index}/
             </span>
-            <span className="text-eyebrow uppercase tracking-eyebrow text-hodex-gray">
-              {project.discipline}
-            </span>
+            <span className="text-eyebrow uppercase tracking-eyebrow text-hodex-gray">{project.discipline}</span>
           </div>
 
           <h3 className="mt-6 font-display text-4xl font-light leading-tight tracking-headline md:text-h2">
-            {project.name}
+            <Link to={`/proyectos/${project.slug}`} className="transition-opacity duration-300 hover:opacity-70">
+              {project.name}
+            </Link>
           </h3>
-          <p className="mt-3 font-body text-body-lg text-hodex-gray">
-            {project.tagline}
-          </p>
-          <p className="mt-5 max-w-md leading-body text-hodex-gray">
-            {project.description}
-          </p>
+          <p className="mt-3 font-body text-body-lg text-hodex-gray">{project.tagline}</p>
+          <p className="mt-5 max-w-md leading-body text-hodex-gray">{project.description}</p>
 
           <div className="mt-7 flex flex-wrap gap-2">
             {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="border border-hodex-line px-3 py-1 text-small text-hodex-gray"
-              >
+              <span key={tag} className="border border-hodex-line px-3 py-1 text-small text-hodex-gray">
                 {tag}
               </span>
             ))}
           </div>
 
-          <div className="mt-8 flex items-center justify-between gap-4">
-            <a
-              href={project.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative inline-flex items-center gap-2 text-eyebrow uppercase tracking-eyebrow text-hodex-black"
-            >
-              Visit {project.domain}
-              <span className="transition-transform duration-300 ease-out group-hover:translate-x-1">
-                &rarr;
-              </span>
-              {/* underline cobre — único acento de color, solo en hover */}
-              <span className="absolute -bottom-2 left-0 h-px w-full origin-left scale-x-0 bg-copper-gradient transition-transform duration-300 ease-out group-hover:scale-x-100" />
-            </a>
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+              <Link
+                to={`/proyectos/${project.slug}`}
+                className="relative inline-flex items-center gap-2 text-eyebrow uppercase tracking-eyebrow text-hodex-black"
+              >
+                Ver el proyecto
+                <span className="transition-transform duration-300 ease-out group-hover:translate-x-1">&rarr;</span>
+                {/* underline cobre — único acento de color, solo en hover */}
+                <span className="absolute -bottom-2 left-0 h-px w-full origin-left scale-x-0 bg-copper-gradient transition-transform duration-300 ease-out group-hover:scale-x-100" />
+              </Link>
+              <a
+                href={project.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-small text-hodex-gray underline-offset-4 transition-colors duration-300 hover:text-hodex-black hover:underline"
+              >
+                {project.domain} ↗
+              </a>
+            </div>
             <span className="text-small text-hodex-gray-light">{project.status}</span>
           </div>
         </div>
@@ -147,28 +73,37 @@ function ProjectRow({ project, reverse }: { project: Project; reverse: boolean }
   )
 }
 
-export default function Work() {
+export default function Work({
+  projects = PROJECTS,
+  eyebrow = 'Proyectos seleccionados',
+  title = 'Proyectos',
+  intro = 'Dos productos ambiciosos, ambos potenciados por inteligencia artificial. Construidos de principio a fin con precisión y sin ruido.',
+  index = '04',
+  id = 'work',
+}: {
+  projects?: Project[]
+  eyebrow?: string
+  title?: string
+  intro?: string
+  index?: string
+  id?: string
+}) {
   return (
-    <section id="work" className="border-b border-hodex-line py-24 md:py-32">
+    <section id={id} className="border-b border-hodex-line py-24 md:py-32">
       <div className="mx-auto max-w-[1320px] px-6">
         <Reveal>
           <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-gray">
-            Selected work
+            {eyebrow}
             <span className="h-px max-w-[220px] flex-1 bg-hodex-line" />
-            <span className="text-hodex-gray-light">03</span>
+            <span className="text-hodex-gray-light">{index}</span>
           </div>
-          <h2 className="mt-6 font-display text-h2 font-light leading-tight tracking-headline">
-            Proyectos
-          </h2>
-          <p className="mt-4 max-w-[600px] leading-body text-hodex-gray">
-            Dos productos ambiciosos, ambos potenciados por inteligencia artificial.
-            Construidos de principio a fin con precisión y sin ruido.
-          </p>
+          <h2 className="mt-6 font-display text-h2 font-light leading-tight tracking-headline">{title}</h2>
+          <p className="mt-4 max-w-[600px] leading-body text-hodex-gray">{intro}</p>
         </Reveal>
 
         <div className="mt-14 md:mt-20">
-          {PROJECTS.map((project, i) => (
-            <Reveal key={project.domain} delay={i * 120}>
+          {projects.map((project, i) => (
+            <Reveal key={project.slug} delay={i * 120}>
               <ProjectRow project={project} reverse={i % 2 === 1} />
             </Reveal>
           ))}

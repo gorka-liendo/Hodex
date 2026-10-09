@@ -49,7 +49,7 @@ const INTENTS: Intent[] = [
 const FIELD_CLASS =
   'w-full border-0 border-b border-hodex-line-dark bg-transparent py-3 font-body text-hodex-white placeholder:text-hodex-white/40 transition-colors duration-300 focus:border-hodex-white focus:outline-none'
 
-export default function Contact() {
+export default function Contact({ showIntro = true }: { showIntro?: boolean }) {
   const [intent, setIntent] = useState<string | null>(null)
   const [intentError, setIntentError] = useState(false)
   const [sent, setSent] = useState(false)
@@ -94,27 +94,29 @@ export default function Contact() {
   return (
     <section id="contact" className="bg-hodex-black py-24 text-hodex-white md:py-32">
       <div className="mx-auto max-w-[1320px] px-6">
-        <Reveal>
-          <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">
-            Get in touch
-            <span className="h-px max-w-[220px] flex-1 bg-hodex-line-dark" />
-            <span className="text-hodex-white/30">05</span>
-          </div>
-          <h2 className="mt-6 font-display text-h2 font-light leading-tight tracking-headline">
-            Hablemos
-          </h2>
-          <p className="mt-6 max-w-[640px] text-body-lg leading-body">
-            <b className="font-semibold text-hodex-white">Cuéntanos quién eres.</b>{' '}
-            <span className="text-hodex-white/55">
-              Nos ayuda a responderte con la persona y el enfoque adecuados desde el
-              primer mensaje.
-            </span>
-          </p>
-        </Reveal>
+        {showIntro && (
+          <Reveal>
+            <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">
+              Contacto
+              <span className="h-px max-w-[220px] flex-1 bg-hodex-line-dark" />
+              <span className="text-hodex-white/30">06</span>
+            </div>
+            <h2 className="mt-6 font-display text-h2 font-light leading-tight tracking-headline">
+              Hablemos
+            </h2>
+            <p className="mt-6 max-w-[640px] text-body-lg leading-body">
+              <b className="font-semibold text-hodex-white">Cuéntanos quién eres.</b>{' '}
+              <span className="text-hodex-white/55">
+                Nos ayuda a responderte con la persona y el enfoque adecuados desde el
+                primer mensaje.
+              </span>
+            </p>
+          </Reveal>
+        )}
 
         {sent ? (
           /* ===== Estado de confirmación ===== */
-          <Reveal className="mt-16">
+          <Reveal className={showIntro ? 'mt-16' : ''}>
             <div className="border-t border-hodex-line-dark pt-16">
               <div className="flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">
                 Mensaje enviado
@@ -127,7 +129,7 @@ export default function Contact() {
             </div>
           </Reveal>
         ) : (
-          <div className="mt-14 grid gap-12 md:mt-20 md:grid-cols-2 md:gap-16">
+          <div className={`grid gap-12 md:grid-cols-2 md:gap-16 ${showIntro ? 'mt-14 md:mt-20' : ''}`}>
             {/* ===== Selector de intención ===== */}
             <Reveal>
               <div className="mb-6 flex items-center gap-4 text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">

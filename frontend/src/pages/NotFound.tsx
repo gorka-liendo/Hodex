@@ -1,15 +1,7 @@
-import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 /** 404 on-brand: fondo negro, wordmark metálico, enlace de vuelta. */
 export default function NotFound() {
-  useEffect(() => {
-    document.title = 'Página no encontrada — Hodex'
-    return () => {
-      document.title = 'Hodex — Automatización con IA y productos web a medida'
-    }
-  }, [])
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-hodex-black px-6 text-center text-hodex-white">
       <div className="text-eyebrow uppercase tracking-eyebrow text-hodex-white/55">

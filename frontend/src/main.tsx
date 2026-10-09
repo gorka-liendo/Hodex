@@ -1,26 +1,22 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { createRoot, hydrateRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import './index.css'
-import App from './App.tsx'
-import ScrollToHash from './components/ScrollToHash.tsx'
-import AvisoLegal from './pages/AvisoLegal.tsx'
-import Privacidad from './pages/Privacidad.tsx'
-import NotFound from './pages/NotFound.tsx'
+import AppRoutes from './AppRoutes'
 
-createRoot(document.getElementById('root')!).render(
+const app = (
   <StrictMode>
     <BrowserRouter>
-      <ScrollToHash />
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/legal/aviso-legal" element={<AvisoLegal />} />
-        <Route path="/legal/privacidad" element={<Privacidad />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <AppRoutes />
       {/* Vercel Web Analytics — requiere Analytics habilitado en el dashboard */}
       <Analytics />
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 )
+
+// En producción cada página llega ya renderizada (prerender): se hidrata.
+// En desarrollo (vite dev) el contenedor viene vacío: se monta desde cero.
+const root = document.getElementById('root')!
+if (root.firstElementChild) hydrateRoot(root, app)
+else createRoot(root).render(app)
