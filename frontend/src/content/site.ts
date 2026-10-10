@@ -13,7 +13,11 @@ export const SITE = {
     'Estudio de diseño y desarrollo web en Castro Urdiales (Cantabria). Creamos webs a medida, aplicaciones y plataformas web, y automatizamos procesos con inteligencia artificial.',
   ogImage: 'https://www.hodex.es/og-image.png',
   /** Perfiles oficiales (Google los relaciona con la web). */
-  sameAs: ['https://www.instagram.com/hodexai'],
+  sameAs: [
+    'https://www.instagram.com/hodexai',
+    // Perfil de Empresa en Google (identificador del Knowledge Graph).
+    'https://www.google.com/search?kgmid=/g/11nw7bncr4',
+  ],
   instagram: 'https://www.instagram.com/hodexai',
   logo: 'https://www.hodex.es/hodex-logo.png',
 } as const
