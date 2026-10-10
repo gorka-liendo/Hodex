@@ -101,7 +101,7 @@ export default function ServicePage() {
       <section className="py-20 md:py-24">
         <div className="mx-auto max-w-[1320px] px-6">
           <SectionEyebrow>También hacemos</SectionEyebrow>
-          <ul className="mt-8 grid list-none gap-2 p-0 md:grid-cols-2">
+          <ul className="mt-8 grid list-none gap-2 p-0 md:grid-cols-3">
             {others.map((s) => (
               <li key={s.slug}>
                 <Link

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { PROJECTS } from '../content/projects'
 import { SERVICES } from '../content/services'
+import { SITE } from '../content/site'
 import Reveal from './Reveal'
 
 /**
@@ -94,6 +95,9 @@ export default function Footer() {
                 <Link to="/contacto" className={linkClass}>
                   Formulario de contacto
                 </Link>
+                <a href={SITE.instagram} target="_blank" rel="noopener noreferrer me" className={linkClass}>
+                  Instagram ↗
+                </a>
               </p>
               <div className="mb-3 mt-6 text-eyebrow uppercase tracking-eyebrow text-hodex-white/50">
                 Ubicación
