@@ -100,7 +100,7 @@ export const PROJECTS: Project[] = [
         desc: 'Peso, grasa corporal, medidas, fotos y check-ins en un calendario, con generación asistida por IA y planes de suscripción.',
       },
     ],
-    stack: ['React', 'IA generativa', 'Suscripciones'],
+    stack: ['React', 'IA generativa', 'Suscripciones', 'App para iPhone (próximamente)'],
     services: ['aplicaciones-a-medida', 'automatizacion-ia'],
   },
 ]

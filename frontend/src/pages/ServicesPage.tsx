@@ -12,10 +12,10 @@ export default function ServicesPage() {
           { name: 'Servicios', to: '/servicios' },
         ]}
         eyebrow="Servicios"
-        title="Diseño web, aplicaciones a medida e inteligencia artificial"
+        title="Diseño web, aplicaciones e inteligencia artificial"
         lead={{
-          strong: 'Tres servicios, un mismo equipo.',
-          rest: 'Desde Castro Urdiales (Cantabria) diseñamos webs, desarrollamos aplicaciones y automatizamos procesos con IA para empresas de toda España. Elige por dónde empezar o cuéntanos tu caso.',
+          strong: 'Un mismo equipo para todo.',
+          rest: 'Desde Castro Urdiales (Cantabria) diseñamos webs, desarrollamos aplicaciones web y móviles, y ponemos la IA a trabajar en tu negocio, también en WhatsApp. Para empresas de toda España. Elige por dónde empezar o cuéntanos tu caso.',
         }}
         cta={{ label: 'Pide presupuesto', to: '/contacto' }}
       />

@@ -34,16 +34,16 @@ export default function Services({
               Qué hacemos
             </Heading>
             <p className="mt-6 max-w-[640px] text-body-lg leading-body">
-              <b className="font-semibold text-hodex-black">Tres servicios, un mismo equipo.</b>{' '}
+              <b className="font-semibold text-hodex-black">Un mismo equipo para todo.</b>{' '}
               <span className="text-hodex-gray">
                 Webs que transmiten lo que eres, aplicaciones que hacen funcionar tu negocio e
-                inteligencia artificial que te quita trabajo repetitivo.
+                inteligencia artificial que atiende a tus clientes y te quita trabajo repetitivo.
               </span>
             </p>
           </Reveal>
         )}
 
-        <div className={`grid gap-2 md:grid-cols-3 ${showIntro ? 'mt-14 md:mt-20' : ''}`}>
+        <div className={`grid gap-2 md:grid-cols-2 xl:grid-cols-4 ${showIntro ? 'mt-14 md:mt-20' : ''}`}>
           {SERVICES.map((service, i) => (
             <Reveal key={service.slug} delay={i * 80} className="h-full">
               <Link

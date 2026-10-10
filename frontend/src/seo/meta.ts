@@ -33,6 +33,7 @@ const business = {
   image: SITE.ogImage,
   email: SITE.email,
   description: SITE.defaultDescription,
+  sameAs: SITE.sameAs,
   address: {
     '@type': 'PostalAddress',
     addressLocality: SITE.locality,
@@ -40,7 +41,15 @@ const business = {
     addressCountry: SITE.country,
   },
   areaServed: SITE.areaServed.map((name) => ({ '@type': name === 'España' ? 'Country' : 'AdministrativeArea', name })),
-  knowsAbout: ['Diseño web', 'Desarrollo web a medida', 'Aplicaciones web', 'Inteligencia artificial', 'Automatización de procesos'],
+  knowsAbout: [
+    'Diseño web',
+    'Desarrollo web a medida',
+    'Aplicaciones web',
+    'Aplicaciones móviles',
+    'Inteligencia artificial',
+    'Automatización de procesos',
+    'Chatbots de WhatsApp',
+  ],
   hasOfferCatalog: {
     '@type': 'OfferCatalog',
     name: 'Servicios',
@@ -91,7 +100,7 @@ export const servicesMeta: PageMeta = {
   path: '/servicios',
   title: 'Servicios de diseño web, aplicaciones e IA — Hodex',
   description:
-    'Diseño y desarrollo web a medida, aplicaciones y plataformas web, y automatización de procesos con inteligencia artificial. Estudio en Castro Urdiales (Cantabria).',
+    'Diseño y desarrollo web a medida, aplicaciones web y móviles, automatización de procesos con IA y bots de WhatsApp. Estudio en Castro Urdiales (Cantabria).',
   jsonLd: [graph(business, breadcrumbs([{ name: 'Inicio', path: '/' }, { name: 'Servicios', path: '/servicios' }]))],
 }
 

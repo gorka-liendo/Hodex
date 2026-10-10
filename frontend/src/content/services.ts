@@ -143,15 +143,15 @@ export const SERVICES: Service[] = [
     slug: 'aplicaciones-a-medida',
     index: '03',
     name: 'Aplicaciones a medida',
-    title: 'Aplicaciones y plataformas web a medida',
-    seoTitle: 'Desarrollo de aplicaciones web a medida — Hodex',
+    title: 'Aplicaciones web y móviles a medida',
+    seoTitle: 'Desarrollo de aplicaciones web y móviles a medida — Hodex',
     seoDescription:
-      'Desarrollamos aplicaciones web a medida: paneles de gestión, plataformas SaaS, áreas de cliente y herramientas internas, con pagos, seguridad y rendimiento de producto serio.',
+      'Desarrollamos aplicaciones a medida: apps nativas para iPhone y Android, paneles de gestión, plataformas SaaS y áreas de cliente, con pagos, seguridad y rendimiento de producto serio.',
     summary:
-      'Paneles de gestión, plataformas SaaS, áreas de cliente y herramientas internas hechas para tu forma de trabajar.',
+      'Apps para iPhone y Android, paneles de gestión, plataformas SaaS y áreas de cliente hechas para tu forma de trabajar.',
     lead: {
       strong: 'Software hecho para tu forma de trabajar.',
-      rest: 'Cuando las hojas de cálculo y las herramientas genéricas se quedan cortas, construimos la aplicación que necesitas: desde un panel interno hasta una plataforma que usan tus clientes.',
+      rest: 'Cuando las hojas de cálculo y las herramientas genéricas se quedan cortas, construimos la aplicación que necesitas: desde un panel interno hasta una plataforma o una app en el móvil de tus clientes.',
     },
     includes: [
       {
@@ -159,16 +159,16 @@ export const SERVICES: Service[] = [
         desc: 'Gestión de clientes, pedidos, facturas o equipos en una sola pantalla, con los datos que de verdad usas.',
       },
       {
-        title: 'Plataformas SaaS y marketplaces',
+        title: 'Plataformas SaaS y áreas de cliente',
         desc: 'Productos con cuentas de usuario, suscripciones y portales para tus clientes, listos para crecer.',
       },
       {
-        title: 'Pagos y facturación',
-        desc: 'Cobros, suscripciones y repartos automáticos con Stripe, y facturas generadas por el propio sistema.',
+        title: 'Apps nativas para iPhone y Android',
+        desc: 'Aplicaciones móviles conectadas a tu plataforma, desde el diseño hasta su publicación en App Store y Google Play.',
       },
       {
-        title: 'Seguridad de verdad',
-        desc: 'Acceso con doble factor, permisos, cifrado de datos sensibles y registro de actividad desde el primer día.',
+        title: 'Pagos y seguridad de verdad',
+        desc: 'Cobros y suscripciones con Stripe, acceso con doble factor, cifrado de datos sensibles y registro de actividad desde el primer día.',
       },
     ],
     forWho: [
@@ -177,6 +177,10 @@ export const SERVICES: Service[] = [
       'Equipos que necesitan una herramienta interna que encaje con su proceso, no al revés.',
     ],
     faqs: [
+      {
+        q: '¿Hacéis apps para iPhone y Android?',
+        a: 'Sí. Desarrollamos apps nativas conectadas a la misma plataforma que tu web, y nos encargamos de publicarlas en App Store y Google Play.',
+      },
       {
         q: '¿Qué diferencia hay entre una web y una aplicación web?',
         a: 'Una web presenta tu negocio; una aplicación web lo hace funcionar: usuarios que inician sesión, datos que se guardan, pagos, paneles. Muchas veces un proyecto tiene las dos partes.',
@@ -195,6 +199,63 @@ export const SERVICES: Service[] = [
       },
     ],
     projects: ['mytrainerhub', 'golink'],
+  },
+  {
+    slug: 'chatbot-whatsapp',
+    index: '04',
+    name: 'Bots de WhatsApp con IA',
+    title: 'Bots de WhatsApp con inteligencia artificial',
+    seoTitle: 'Chatbot de WhatsApp con IA para empresas — Hodex',
+    seoDescription:
+      'Asistentes de WhatsApp con inteligencia artificial que atienden a tus clientes, gestionan reservas y resuelven dudas las 24 horas. Para inmobiliarias, centros deportivos, entrenadores y más.',
+    summary:
+      'Asistentes de WhatsApp que atienden a tus clientes, gestionan reservas y resuelven dudas las 24 horas.',
+    lead: {
+      strong: 'Tus clientes ya te escriben por WhatsApp.',
+      rest: 'Un asistente con inteligencia artificial les responde al momento, con la información de tu negocio, gestiona sus reservas y te pasa la conversación cuando hace falta una persona. A cualquier hora.',
+    },
+    includes: [
+      {
+        title: 'Atención las 24 horas',
+        desc: 'Responde dudas sobre precios, horarios o servicios con la información de tu negocio y en el tono de tu marca.',
+      },
+      {
+        title: 'Reservas y citas',
+        desc: 'Consulta la disponibilidad y reserva, cambia o cancela citas desde la propia conversación, conectado a tu agenda.',
+      },
+      {
+        title: 'Captación de clientes',
+        desc: 'Detecta a los interesados, les pregunta lo necesario y te deja sus datos listos para que los contactes.',
+      },
+      {
+        title: 'Una persona cuando hace falta',
+        desc: 'Si la consulta lo requiere, pasa la conversación a tu equipo con todo el contexto. Datos alojados en la UE y conforme al RGPD.',
+      },
+    ],
+    forWho: [
+      'Inmobiliarias que reciben muchas consultas sobre pisos y visitas.',
+      'Centros deportivos y de pilates que gestionan reservas de clases.',
+      'Entrenadores personales y creadores de contenido que no dan abasto con los mensajes.',
+    ],
+    faqs: [
+      {
+        q: '¿Funciona con mi número de WhatsApp?',
+        a: 'Funciona con la plataforma oficial de WhatsApp para empresas. Puede usar tu número de empresa o uno nuevo; te ayudamos a elegir la mejor opción para tu caso.',
+      },
+      {
+        q: '¿Qué pasa si el bot no sabe responder?',
+        a: 'Lo reconoce y pasa la conversación a una persona de tu equipo, con el historial completo, para que nadie se quede sin respuesta.',
+      },
+      {
+        q: '¿Cumple el RGPD?',
+        a: 'Sí. Los datos se alojan en la UE, se guardan solo los necesarios y el cliente sabe en todo momento que habla con un asistente.',
+      },
+      {
+        q: '¿Cuánto cuesta?',
+        a: 'Te damos un presupuesto cerrado tras una primera llamada gratuita. WhatsApp aplica además su propia tarifa por conversación, que te explicamos antes de empezar.',
+      },
+    ],
+    projects: [],
   },
 ]
 
